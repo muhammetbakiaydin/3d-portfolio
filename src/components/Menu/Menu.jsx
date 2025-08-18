@@ -84,12 +84,6 @@ const Menu = ({ active, onChange }) => {
   // Removed previous wobble effect; replace with holder arrival animation
   useEffect(() => {
     updateHolder();
-    const holder = holderRef.current;
-    if (holder) {
-      holder.classList.add("arrive");
-      const t = setTimeout(() => holder.classList.remove("arrive"), 320);
-      return () => clearTimeout(t);
-    }
   }, [internalActive, updateHolder]);
 
   // Ripple effect (duration adjusted to ~450ms spec)
@@ -159,6 +153,12 @@ const Menu = ({ active, onChange }) => {
               </li>
             );
         })}
+      </ul>
+    </nav>
+  );
+};
+
+export default Menu;
       </ul>
     </nav>
   );
