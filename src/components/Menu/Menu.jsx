@@ -17,7 +17,7 @@ export default function Menu({ active: initial = "home", onChange }) {
 
   return (
     <nav className="menu-glass-dock" role="navigation" aria-label="Main navigation">
-      <ul className="dock-list">
+      <ul className="dock-list" style={{padding: "8px 8px"}}>
         {ITEMS.map(({ id, label, icon: Icon }) => (
           <li key={id} className="dock-item">
             <button
