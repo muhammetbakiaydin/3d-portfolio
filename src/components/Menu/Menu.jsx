@@ -46,6 +46,8 @@ function BrainIcon(props) {
   );
 }
 
+const HOLDER_EXTRA = 8; // extra width (4px padding each side for holder wrap)
+
 const Menu = ({ active, onChange }) => {
   const [internalActive, setInternalActive] = useState(active || "home");
   const dockRef = useRef(null);
@@ -64,11 +66,11 @@ const Menu = ({ active, onChange }) => {
     const id = active || internalActive;
     const el = btnRefs.current[id];
     const holder = holderRef.current;
-    if (!el || !holder) return;
+    if (!el || !holder || !dockRef.current) return;
     const dockRect = dockRef.current.getBoundingClientRect();
     const r = el.getBoundingClientRect();
-    const left = r.left - dockRect.left;
-    const width = r.width;
+    const left = r.left - dockRect.left - HOLDER_EXTRA / 2;
+    const width = r.width + HOLDER_EXTRA;
     holder.style.setProperty("--holder-left", `${left}px`);
     holder.style.setProperty("--holder-width", `${width}px`);
   }, [active, internalActive]);
@@ -79,7 +81,18 @@ const Menu = ({ active, onChange }) => {
     return () => window.removeEventListener("resize", updateHolder);
   }, [updateHolder, internalActive, active]);
 
-  // Ripple effect
+  // Removed previous wobble effect; replace with holder arrival animation
+  useEffect(() => {
+    updateHolder();
+    const holder = holderRef.current;
+    if (holder) {
+      holder.classList.add("arrive");
+      const t = setTimeout(() => holder.classList.remove("arrive"), 320);
+      return () => clearTimeout(t);
+    }
+  }, [internalActive, updateHolder]);
+
+  // Ripple effect (duration adjusted to ~450ms spec)
   const handlePress = (e, id) => {
     setInternalActive(id);
     onChange && onChange(id);
@@ -93,17 +106,8 @@ const Menu = ({ active, onChange }) => {
     ripple.style.top = `${e.clientY - rect.top - size / 2}px`;
     btn.appendChild(ripple);
     requestAnimationFrame(() => ripple.classList.add("run"));
-    setTimeout(() => ripple.remove(), 650);
+    setTimeout(() => ripple.remove(), 500);
   };
-
-  // Small active wobble
-  useEffect(() => {
-    const el = btnRefs.current[internalActive];
-    if (!el) return;
-    el.classList.add("wobble");
-    const t = setTimeout(() => el.classList.remove("wobble"), 220);
-    return () => clearTimeout(t);
-  }, [internalActive]);
 
   // Pointer move tilt
   const handlePointerMove = (e) => {

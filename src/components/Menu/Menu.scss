@@ -1,79 +1,76 @@
-// Design Tokens
-$blur-md: 24px;
-$blur-lg: 36px;
+// --- New Design Tokens (refined) ---
+$palette-a: #2DD4BF;
+$palette-b: #60A5FA;
+$palette-c: #A78BFA;
+
 $glass-fill: rgba(255,255,255,0.08);
-$border-outer: rgba(255,255,255,0.25);
+$holder-fill: rgba(255,255,255,0.14);
+
+$border-outer: rgba(255,255,255,0.22);
 $border-inner: rgba(255,255,255,0.45);
-$shadow-strong: 0 12px 32px rgba(0,0,0,0.25), 0 2px 6px rgba(0,0,0,0.18);
-$radius-2xl: 24px;
-$radius-full: 999px;
-$timing-spring: cubic-bezier(.2,.8,.2,1);
-$holder-bg: rgba(255,255,255,0.12);
-$holder-border-outer: rgba(255,255,255,0.35);
-$holder-border-inner: rgba(255,255,255,0.55);
+$border-holder-outer: rgba(255,255,255,0.38);
+$border-holder-inner: rgba(255,255,255,0.55);
 
-$accents: (
-  a: #4FACFE,
-  b: #9B50FF,
-  c: #FF6B6B,
-  d: #FFD166,
-  e: #2AF598
-);
+$blur-dock: 32px;
+$blur-holder: 36px;
+$blur-chip: 24px;
 
-@mixin glass-border($outer, $inner) {
-  border: 1px solid $outer;
-  box-shadow: inset 0 0 0 1px $inner;
+$radius-dock: 32px;
+$radius-chip: 20px;
+
+$shadow-dock: 0 10px 28px rgba(0,0,0,0.22);
+$shadow-chip-hover: 0 4px 14px rgba(0,0,0,0.25), 0 1px 2px rgba(0,0,0,0.35);
+
+$timing-spring: cubic-bezier(.2,.8,.25,1);
+$timing-holder: 240ms $timing-spring;
+
+$gradient-accent: linear-gradient(120deg, $palette-a, $palette-b, $palette-c);
+@function accent-conic() {
+  @return conic-gradient(from 0deg, $palette-a, $palette-b, $palette-c, $palette-a);
 }
 
-@function conic-accent() {
-  @return conic-gradient(from 0deg,
-    map-get($accents,a),
-    map-get($accents,b),
-    map-get($accents,c),
-    map-get($accents,d),
-    map-get($accents,e),
-    map-get($accents,a)
-  );
-}
-
-// Noise data URI (tiny)
 $noise: url("data:image/svg+xml;utf8,\
 <svg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'>\
 <filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/></filter>\
-<rect width='80' height='80' filter='url(%23n)' opacity='0.12'/>\
-</svg>");
+<rect width='80' height='80' filter='url(%23n)' opacity='0.10'/></svg>");
 
+@mixin glass-border($outer, $inner) {
+  border: 1px solid $outer;
+  box-shadow: inset 0 1px 0 $inner;
+}
+
+// --- Dock ---
 .menu-glass-dock {
   position: fixed;
   left: 50%;
   bottom: clamp(12px, env(safe-area-inset-bottom) + 12px, 28px);
   transform: translateX(-50%);
   z-index: 50;
-  width: fit-content;
   max-width: 720px;
   min-width: 320px;
-  padding: 12px 20px;
-  border-radius: $radius-full;
+  width: fit-content;
+  padding: 14px 22px;
+  border-radius: $radius-dock;
   isolation: isolate;
   --holder-left: 0px;
   --holder-width: 0px;
+  display: flex;
 
   .dock-bg {
     position: absolute;
     inset: 0;
     background: $glass-fill;
-    backdrop-filter: blur($blur-lg) saturate(170%);
-    -webkit-backdrop-filter: blur($blur-lg) saturate(170%);
+    backdrop-filter: blur($blur-dock) saturate(170%);
+    -webkit-backdrop-filter: blur($blur-dock) saturate(170%);
     @include glass-border($border-outer, $border-inner);
     border-radius: inherit;
     overflow: hidden;
-    box-shadow: $shadow-strong;
+    box-shadow: $shadow-dock;
     &::before {
       content: "";
       position: absolute;
       inset: 0;
-      background: linear-gradient(180deg, rgba(255,255,255,0.22), rgba(255,255,255,0) 60%);
-      mix-blend-mode: screen;
+      background: linear-gradient(180deg, rgba(255,255,255,0.28), rgba(255,255,255,0) 55%);
       pointer-events: none;
     }
     &::after {
@@ -81,32 +78,33 @@ $noise: url("data:image/svg+xml;utf8,\
       position: absolute;
       inset: 0;
       background: $noise;
-      opacity: .4;
       mix-blend-mode: overlay;
+      opacity: .35;
       pointer-events: none;
     }
   }
 
-  // Aurora blobs
-  &::before,
+  // Subtle outer gradient glow
+  &::before {
+    content: "";
+    position: absolute;
+    inset: -40px -80px;
+    background:
+      radial-gradient(circle at 35% 60%, rgba($palette-a,0.18), transparent 70%),
+      radial-gradient(circle at 65% 40%, rgba($palette-c,0.18), transparent 72%);
+    filter: blur(30px);
+    pointer-events: none;
+    opacity: .9;
+  }
   &::after {
     content: "";
     position: absolute;
-    width: 420px;
-    height: 420px;
-    border-radius: 50%;
-    filter: blur(110px);
-    opacity: .65;
-    z-index: -2;
-    animation: drift 26s ease-in-out infinite;
-    background: radial-gradient(circle at 30% 30%, map-get($accents,a), transparent 70%),
-      radial-gradient(circle at 70% 60%, map-get($accents,c), transparent 70%),
-      radial-gradient(circle at 50% 80%, map-get($accents,e), transparent 75%);
-  }
-  &::after {
-    animation-direction: reverse;
-    transform: translate(30%,10%);
-    mix-blend-mode: plus-lighter;
+    inset: -20px;
+    background: radial-gradient(circle at 50% 50%, rgba($palette-b,0.18), transparent 65%);
+    filter: blur(32px);
+    pointer-events: none;
+    opacity: .7;
+    mix-blend-mode: normal;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -115,28 +113,22 @@ $noise: url("data:image/svg+xml;utf8,\
       animation: none;
     }
   }
-
-  @keyframes drift {
-    0% { transform: translate(-10%,0) scale(1); }
-    50% { transform: translate(8%,6%) scale(1.08); }
-    100% { transform: translate(-10%,0) scale(1); }
-  }
 }
 
+// --- List Layout ---
 .dock-list {
   position: relative;
-  list-style: none;
   margin: 0;
   padding: 0;
+  list-style: none;
   display: flex;
-  gap: 8px;
+  gap: 12px;
   align-items: stretch;
-  justify-content: space-between;
   min-height: 56px;
 }
 
+// --- Items / Buttons ---
 .dock-item {
-  position: relative;
   flex: 1 1 0;
   display: flex;
 }
@@ -146,26 +138,29 @@ $noise: url("data:image/svg+xml;utf8,\
   --tilt-y: 0deg;
   position: relative;
   flex: 1;
-  border: none;
-  outline: none;
-  cursor: pointer;
-  border-radius: $radius-2xl;
-  padding: 10px 20px 8px;
-  background: rgba(255,255,255,0.06);
-  backdrop-filter: blur($blur-md) saturate(160%);
-  -webkit-backdrop-filter: blur($blur-md) saturate(160%);
-  @include glass-border($border-outer, rgba(255,255,255,0.18));
   display: flex;
   justify-content: center;
   align-items: center;
-  min-width: 0;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 10px 16px;
   min-height: 56px;
+  border-radius: $radius-chip;
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur($blur-chip) saturate(160%);
+  -webkit-backdrop-filter: blur($blur-chip) saturate(160%);
+  @include glass-border($border-outer, rgba(255,255,255,0.2));
+  font: 600 13px/1 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  letter-spacing: 0.2px;
   color: #111;
-  font: 500 13px/1.1 system-ui, sans-serif;
-  letter-spacing: .25px;
-  position: relative;
   overflow: hidden;
-  transition: transform .4s $timing-spring, background .4s, box-shadow .4s, color .4s;
+  transition:
+    transform .45s $timing-spring,
+    background .35s,
+    box-shadow .4s,
+    color .35s;
+
   transform: perspective(600px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y));
   -webkit-tap-highlight-color: transparent;
 
@@ -173,14 +168,14 @@ $noise: url("data:image/svg+xml;utf8,\
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4px;
+    gap: 8px;
     pointer-events: none;
   }
   .btn-ic {
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 20px;
     flex-shrink: 0;
-    transition: filter .4s, transform .35s $timing-spring;
+    transition: transform .4s $timing-spring;
   }
   .btn-label {
     white-space: nowrap;
@@ -190,51 +185,43 @@ $noise: url("data:image/svg+xml;utf8,\
   &:hover,
   &:focus-visible {
     background: rgba(255,255,255,0.1);
-    transform: translateY(-2px) perspective(600px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y)) scale(1.02);
-    box-shadow: 0 4px 16px rgba(0,0,0,0.25), 0 1px 3px rgba(0,0,0,0.4);
+    transform:
+      translateY(-2px)
+      perspective(600px)
+      rotateX(var(--tilt-x)) rotateY(var(--tilt-y)) scale(1.02);
+    box-shadow: $shadow-chip-hover;
   }
 
   &:focus-visible {
     box-shadow:
-      0 0 0 2px rgba(255,255,255,0.8),
-      0 0 0 4px rgba(255,255,255,0.25),
-      0 0 0 6px map-get($accents,b);
+      0 0 0 2px rgba(255,255,255,0.85),
+      0 0 0 4px rgba($palette-b,0.55);
   }
 
   &.is-active {
     color: #000;
-    .btn-ic { transform: scale(1.06); }
+    .btn-ic { transform: scale(1.04); }
   }
 
-  &.wobble .btn-ic {
-    animation: wobble .22s ease;
-  }
-
-  @keyframes wobble {
-    0% { transform: scale(1) rotate(0deg); }
-    30% { transform: scale(1.12) rotate(4deg); }
-    70% { transform: scale(1.05) rotate(-3deg); }
-    100% { transform: scale(1.06) rotate(0deg); }
-  }
-
-  // Ripple
+  // Ripple (white, softer, 450ms)
   .m-ripple {
     position: absolute;
     border-radius: 50%;
-    background: radial-gradient(circle at center, rgba(255,255,255,0.35), rgba(255,255,255,0) 70%);
+    background: radial-gradient(circle at center, rgba(255,255,255,0.3), rgba(255,255,255,0) 65%);
     opacity: 0;
     transform: scale(.2);
     pointer-events: none;
   }
   .m-ripple.run {
-    animation: ripple .6s ease-out forwards;
+    animation: ripple .45s ease-out forwards;
   }
   @keyframes ripple {
-    to { opacity: 0; transform: scale(1); }
-    40% { opacity: .5; }
+    40% { opacity: .45; }
+    100% { opacity: 0; transform: scale(1); }
   }
 }
 
+// --- Active Holder ---
 .active-holder {
   position: absolute;
   top: 0;
@@ -242,90 +229,95 @@ $noise: url("data:image/svg+xml;utf8,\
   width: var(--holder-width);
   height: 100%;
   pointer-events: none;
-  border-radius: $radius-2xl;
-  background: $holder-bg;
-  backdrop-filter: blur(32px) saturate(180%);
-  -webkit-backdrop-filter: blur(32px) saturate(180%);
-  @include glass-border($holder-border-outer, $holder-border-inner);
-  box-shadow:
-    inset 0 -1px 6px rgba(0,0,0,0.15),
-    0 0 0 1px rgba(255,255,255,0.15),
-    0 0 24px 8px rgba(255,255,255,0.08),
-    0 0 48px -8px rgba(0,0,0,0.35);
+  border-radius: $radius-chip;
+  background: $holder-fill;
+  backdrop-filter: blur($blur-holder) saturate(180%);
+  -webkit-backdrop-filter: blur($blur-holder) saturate(180%);
+  border: 1px solid $border-holder-outer;
+  box-shadow: inset 0 1px 0 $border-holder-inner;
   transition:
-    left .55s $timing-spring,
-    width .55s $timing-spring,
-    transform .55s $timing-spring;
+    left $timing-holder,
+    width $timing-holder,
+    transform 320ms $timing-spring;
+  transform-origin: center;
   overflow: hidden;
 
+  // Subtle accent ring + glow
   &::before {
     content: "";
     position: absolute;
     inset: 0;
-    padding: 1px;
     border-radius: inherit;
-    background: conic-accent();
+    padding: 1px;
+    background: accent-conic();
+    opacity: .6;
     mask: linear-gradient(#000,#000) content-box, linear-gradient(#000,#000);
     -webkit-mask: linear-gradient(#000,#000) content-box, linear-gradient(#000,#000);
     mask-composite: exclude;
     -webkit-mask-composite: xor;
-    opacity: .9;
-    mix-blend-mode: plus-lighter;
     pointer-events: none;
   }
-
   &::after {
     content: "";
     position: absolute;
-    inset: 0;
+    inset: -10px;
+    border-radius: inherit;
     background:
-      radial-gradient(circle at 30% 20%, rgba(255,255,255,0.35), transparent 60%),
-      linear-gradient(180deg, rgba(255,255,255,0.25), rgba(255,255,255,0) 65%);
-    mix-blend-mode: screen;
-    opacity: .65;
+      radial-gradient(circle at 50% 50%, rgba($palette-b,0.18), transparent 70%),
+      radial-gradient(circle at 30% 60%, rgba($palette-a,0.14), transparent 70%),
+      radial-gradient(circle at 70% 40%, rgba($palette-c,0.14), transparent 70%);
+    filter: blur(28px);
+    opacity: .9;
     pointer-events: none;
+  }
+
+  &.arrive {
+    animation: holder-pop .32s $timing-spring;
+  }
+  @keyframes holder-pop {
+    0% { transform: scale(.96); }
+    55% { transform: scale(1.02); }
+    100% { transform: scale(1); }
   }
 }
 
-// Active accent ring (drawn by pseudo on active button)
+// Active button subtle inner ring (toned)
 .m-btn.is-active::after {
   content: "";
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: conic-accent();
-  opacity: .9;
-  mask: radial-gradient(circle at center, rgba(0,0,0,0) 60%, #000 61%);
-  mix-blend-mode: color-dodge;
+  background: accent-conic();
+  opacity: .25;
+  mask: radial-gradient(circle at center, rgba(0,0,0,0) 58%, #000 59%);
   pointer-events: none;
 }
 
-// Dark theme adapt
+// Dark theme adjustments
 @media (prefers-color-scheme: dark) {
   .m-btn {
     color: #f5f7fa;
-    .btn-label { color: inherit; }
     background: rgba(255,255,255,0.07);
     &.is-active { color: #fff; }
   }
   .active-holder {
-    background: rgba(255,255,255,0.16);
+    background: rgba(255,255,255,0.17);
   }
   .menu-glass-dock .dock-bg {
-    background: rgba(40,40,48,0.28);
+    background: rgba(32,32,40,0.28);
   }
 }
 
-// Reduced motion
+// Reduced motion: remove transform transitions
 @media (prefers-reduced-motion: reduce) {
-  .m-btn,
-  .active-holder {
+  .active-holder,
+  .m-btn {
     transition: none !important;
     animation: none !important;
   }
 }
 
-// Very small screens: hide inactive labels
+// Mobile label visibility
 @media (max-width: 480px) {
   .m-btn .btn-label {
     opacity: 0;
@@ -336,7 +328,7 @@ $noise: url("data:image/svg+xml;utf8,\
     transform: translateY(0);
   }
   .menu-glass-dock {
-    padding: 10px 14px;
+    padding: 12px 18px;
     min-width: 0;
   }
 }
@@ -346,7 +338,15 @@ $noise: url("data:image/svg+xml;utf8,\
   .menu-glass-dock .dock-bg,
   .m-btn,
   .active-holder {
-    background: rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.16);
+    box-shadow: $shadow-dock;
+  }
+}
+
+// Contrast assist
+.m-btn {
+  text-shadow: 0 1px 2px rgba(0,0,0,0.35);
+}
     box-shadow: $shadow-strong;
   }
 }
