@@ -159,9 +159,3 @@ const Menu = ({ active, onChange }) => {
 };
 
 export default Menu;
-      </ul>
-    </nav>
-  );
-};
-
-export default Menu;
