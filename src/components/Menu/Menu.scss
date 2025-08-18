@@ -1,33 +1,26 @@
-/* ===== Design Tokens ===== */
-:root {
+/* ===== Tokens ===== */
+:root{
   --dock-h: 76px;
-  --radius-dock: 10px;         /* her zaman kusursuz pill */
-  --radius-chip: 10px;
+  --radius-dock: 15px;
+  --radius-chip: 15px;
 
   --blur-dock: 32px;
-  --blur-holder: 36px;
   --blur-chip: 24px;
 
-  --glass-fill: rgba(255,255,255,0.08);
-  --chip-fill: rgba(255,255,255,0.06);
-  --holder-fill: rgba(255,255,255,0.14);
+  --glass-fill: rgba(255,255,255,.08);
+  --chip-fill:  rgba(255,255,255,.06);
 
-  --border-outer: rgba(255,255,255,0.22);
-  --border-inner: rgba(255,255,255,0.45);
-  --border-holder: rgba(255,255,255,0.38);
+  --border-outer: rgba(255,255,255,.22);
+  --border-inner: rgba(255,255,255,.45);
 
-  --shadow-strong: 0 12px 32px rgba(0,0,0,0.25);
-  --shadow-soft: 0 6px 16px rgba(0,0,0,0.18);
+  --shadow-strong: 0 12px 32px rgba(0,0,0,.25);
+  --shadow-soft:   0  6px 16px rgba(0,0,0,.18);
 
   --gap: 12px;
-
-  /* JS tarafından set ediliyor */
-  --holder-left: 8px;
-  --holder-width: 140px;
 }
 
-/* ===== Dock (kusursuz kapsül) ===== */
-.menu-glass-dock {
+/* ===== Dock (perfect pill) ===== */
+.menu-glass-dock{
   position: fixed;
   left: 50%;
   bottom: calc(env(safe-area-inset-bottom) + 16px);
@@ -37,77 +30,35 @@
   height: var(--dock-h);
   padding: 8px;
   border-radius: var(--radius-dock);
-  overflow: hidden;                         /* köşeden taşan her şeyi kırp */
+  overflow: hidden;
+
   background: var(--glass-fill);
   backdrop-filter: blur(var(--blur-dock));
   -webkit-backdrop-filter: blur(var(--blur-dock));
   border: 1px solid var(--border-outer);
   box-shadow: var(--shadow-strong), var(--shadow-soft);
 
-  /* Önceki üretimlerden kalan tüm renkli/gradient katmanları öldür */
-  &, &::before, &::after {
-    background-image: none !important;
-    box-shadow: none;
+  &, &::before, &::after{
+    background-image: none !important; /* eski renkli katmanlar kapanır */
   }
 }
 
-/* Bazı projelerde dock-bg ek katman kullanılıyor; renksiz/boş bırak */
-.menu-glass-dock .dock-bg {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: transparent !important;
-  background-image: none !important;
-}
-
-/* ===== Liste / İç düzen ===== */
-.dock-list {
+/* ===== İç düzen ===== */
+.dock-list{
   height: 100%;
   display: flex;
   align-items: center;
   gap: var(--gap);
-  position: relative;  /* holder referansı */
-  margin: 0;
-  padding: 0;
-  list-style: none;
+  margin: 0; padding: 0; list-style: none;
 }
 
-/* ===== Neutral Glass Holder (renksiz) ===== */
-.active-holder {
-  position: absolute;
-  top: 8px;
-  left: var(--holder-left);
-  width: var(--holder-width);
-  height: calc(100% - 16px);
-  border-radius: var(--radius-chip);
-  background: var(--holder-fill);
-  backdrop-filter: blur(var(--blur-holder));
-  -webkit-backdrop-filter: blur(var(--blur-holder));
-  border: 1px solid var(--border-holder);
-  box-shadow: inset 0 1px var(--border-inner), 0 10px 28px rgba(0,0,0,0.22);
-  z-index: 0;
-  transition:
-    left 220ms cubic-bezier(.2,.8,.2,1),
-    width 220ms cubic-bezier(.2,.8,.2,1),
-    transform 220ms cubic-bezier(.2,.8,.2,1);
+/* ===== Buttons (labels always beside icons) ===== */
+.dock-item{ display: flex; }
 
-  /* Holder üzerine asla renk/gradient gelmesin */
-  &::before,
-  &::after {
-    content: none !important;
-    background: none !important;
-    background-image: none !important;
-    box-shadow: none !important;
-  }
-}
-
-/* ===== Butonlar (chip) ===== */
-.dock-item { display: flex; }
-
-.m-btn {
+.m-btn{
   position: relative;
-  z-index: 1; /* holder arkada */
   display: inline-flex;
+  flex-direction: row;          /* <- yazılar yanında */
   align-items: center;
   gap: 8px;
 
@@ -118,56 +69,46 @@
   -webkit-backdrop-filter: blur(var(--blur-chip));
   border: 1px solid var(--border-outer);
   color: #fff;
-  font-weight: 600;
-  letter-spacing: .2px;
-  line-height: 1;
+  font-weight: 600; letter-spacing: .2px; line-height: 1;
   cursor: pointer;
   transition: transform 140ms ease, box-shadow 140ms ease;
 
-  /* Her türlü renkli pseudo katmanını etkisizleştir */
-  &::before,
-  &::after {
-    content: none !important;
-    background: none !important;
-    background-image: none !important;
-    box-shadow: none !important;
+  .btn-ic{ width: 20px; height: 20px; display: grid; place-items: center; }
+  .btn-label{ white-space: nowrap; }
+
+  /* Her ihtimale karşı olası pseudo-blob’ları kapat */
+  &::before{ content: none !important; }
+
+  /* Şeffaf gradient katmanı (sadece aktif/press'te görünür) */
+  &::after{
+    content: "";
+    position: absolute; inset: 0; border-radius: inherit;
+    pointer-events: none;
+    background: linear-gradient(135deg,
+                 rgba(255,255,255,.22) 0%,
+                 rgba(255,255,255,.10) 55%,
+                 rgba(255,255,255,0) 100%);
+    opacity: 0;
+    transition: opacity 200ms ease;
+    mix-blend-mode: normal; /* renkli görünmez, sadece parlaklık */
   }
 
-  &:hover { transform: translateY(-2px); }
-  &:active { transform: translateY(0); }
-
-  .btn-ic { width: 20px; height: 20px; display: grid; place-items: center; }
-  .btn-label { white-space: nowrap; }
+  &:hover{ transform: translateY(-2px); }
+  &:active::after{ opacity: 1; }       /* basılı tutarken görünür */
 }
 
-/* Aktif buton: sadece kenar kontrastını artır; renk yok */
-.m-btn.is-active {
-  border-color: var(--border-holder);
+/* Aktif buton: sadece kenar ve gradient */
+.m-btn.is-active{
+  border-color: rgba(255,255,255,.38);
+}
+.m-btn.is-active::after{ opacity: 1; }  /* tıklanmış/aktif durumda gradient açık */
+
+/* Light mode metin rengi */
+@media (prefers-color-scheme: light){
+  .menu-glass-dock, .m-btn{ color: #111; }
 }
 
-/* Ripple: nötr beyaz; gradient kullanılmıyor */
-.m-btn .m-ripple {
-  position: absolute;
-  border-radius: 9999px;
-  transform: scale(0);
-  opacity: .25;
-  background: radial-gradient(rgba(255,255,255,.35), rgba(255,255,255,0) 60%);
-  pointer-events: none;
-  mix-blend-mode: normal;
-}
-.m-btn .m-ripple.run {
-  animation: ripple .45s ease-out forwards;
-}
-@keyframes ripple {
-  to { transform: scale(1); opacity: 0; }
-}
-
-/* Işık/Koyu tema */
-@media (prefers-color-scheme: light) {
-  .menu-glass-dock, .m-btn, .active-holder { color: #111; }
-}
-
-/* Erişilebilirlik / hareket azaltma */
-@media (prefers-reduced-motion: reduce) {
-  .active-holder, .m-btn { transition: none !important; }
+/* Hareket azaltma */
+@media (prefers-reduced-motion: reduce){
+  .m-btn{ transition: none !important; }
 }
