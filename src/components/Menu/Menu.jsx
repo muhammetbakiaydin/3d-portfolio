@@ -1,131 +1,162 @@
-import "./Menu.scss";
-import { NavLink } from "react-router";
-import { useToggleRoomStore } from "../../stores/toggleRoomStore";
-import { useEffect, useRef } from "react";
-import gsap from "gsap";
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import "./Menu.scss"; // glass dock styles
 
-const Menu = () => {
-  const { isDarkRoom, isBeforeZooming } = useToggleRoomStore();
+const BUTTONS = [
+  { id: "home", label: "Ana Sayfa", icon: HomeIcon },
+  { id: "design", label: "Tasarım", icon: PenIcon },
+  { id: "brainstorm", label: "Beyin Fırtınası", icon: BrainIcon },
+];
 
-  const menuRef = useRef();
+function HomeIcon(props) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" {...props}>
+      <path
+        d="M4 11.4 12 4l8 7.4v8.6a.6.6 0 0 1-.6.6H14a.6.6 0 0 1-.6-.6v-5.4H10.6V20a.6.6 0 0 1-.6.6H4.6a.6.6 0 0 1-.6-.6v-8.6Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+function PenIcon(props) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" {...props}>
+      <path
+        d="M4 17.5 15.9 5.6a2 2 0 0 1 2.8 0l1.7 1.7a2 2 0 0 1 0 2.8L8.5 22H4v-4.5Z"
+        fill="currentColor"
+      />
+      <path d="M13.5 7.9 16.1 10.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+    </svg>
+  );
+}
+function BrainIcon(props) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" {...props}>
+      <path
+        d="M9.2 3A3.2 3.2 0 0 0 6 6.2v11A3.2 3.2 0 0 0 9.2 20h.3A3.5 3.5 0 0 0 16 20a3.5 3.5 0 0 0 4-3.4V9.8A3.8 3.8 0 0 0 16.2 6 3.2 3.2 0 0 0 13 3h-3.8Z"
+        fill="currentColor"
+      />
+      <path
+        d="M9 7.5v3M12 6v3.2M15 8v3M12 13v2.8M9 13.5v2M15 13.2v2.3"
+        stroke="#000"
+        strokeLinecap="round"
+        strokeWidth="1.2"
+        style={{ mixBlendMode: "overlay" }}
+      />
+    </svg>
+  );
+}
 
-  const buttonClassNames = `nav-button${!isDarkRoom ? " light" : ""}`;
+const Menu = ({ active, onChange }) => {
+  const [internalActive, setInternalActive] = useState(active || "home");
+  const dockRef = useRef(null);
+  const btnRefs = useRef({});
+  const holderRef = useRef(null);
 
+  // Sync external active prop
   useEffect(() => {
-    if (!menuRef.current) return;
-
-    if (isBeforeZooming) {
-      gsap.to(menuRef.current, {
-        opacity: 0,
-        duration: 1,
-      });
-    } else {
-      gsap.to(menuRef.current, {
-        opacity: 1,
-        duration: 1,
-      });
+    if (active && active !== internalActive) {
+      setInternalActive(active);
     }
-  }, [isBeforeZooming]);
+  }, [active, internalActive]);
+
+  // Update holder capsule position
+  const updateHolder = useCallback(() => {
+    const id = active || internalActive;
+    const el = btnRefs.current[id];
+    const holder = holderRef.current;
+    if (!el || !holder) return;
+    const dockRect = dockRef.current.getBoundingClientRect();
+    const r = el.getBoundingClientRect();
+    const left = r.left - dockRect.left;
+    const width = r.width;
+    holder.style.setProperty("--holder-left", `${left}px`);
+    holder.style.setProperty("--holder-width", `${width}px`);
+  }, [active, internalActive]);
+
+  useLayoutEffect(() => {
+    updateHolder();
+    window.addEventListener("resize", updateHolder);
+    return () => window.removeEventListener("resize", updateHolder);
+  }, [updateHolder, internalActive, active]);
+
+  // Ripple effect
+  const handlePress = (e, id) => {
+    setInternalActive(id);
+    onChange && onChange(id);
+    const btn = e.currentTarget;
+    const ripple = document.createElement("span");
+    ripple.className = "m-ripple";
+    const rect = btn.getBoundingClientRect();
+    const size = Math.max(rect.width, rect.height) * 1.4;
+    ripple.style.width = ripple.style.height = `${size}px`;
+    ripple.style.left = `${e.clientX - rect.left - size / 2}px`;
+    ripple.style.top = `${e.clientY - rect.top - size / 2}px`;
+    btn.appendChild(ripple);
+    requestAnimationFrame(() => ripple.classList.add("run"));
+    setTimeout(() => ripple.remove(), 650);
+  };
+
+  // Small active wobble
+  useEffect(() => {
+    const el = btnRefs.current[internalActive];
+    if (!el) return;
+    el.classList.add("wobble");
+    const t = setTimeout(() => el.classList.remove("wobble"), 220);
+    return () => clearTimeout(t);
+  }, [internalActive]);
+
+  // Pointer move tilt
+  const handlePointerMove = (e) => {
+    const target = e.target.closest(".m-btn");
+    if (!target) return;
+    const rect = target.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    target.style.setProperty("--tilt-x", `${y * 4}deg`);
+    target.style.setProperty("--tilt-y", `${x * 4}deg`);
+  };
+  const resetTilt = (e) => {
+    const target = e.target.closest(".m-btn");
+    if (target) {
+      target.style.setProperty("--tilt-x", `0deg`);
+      target.style.setProperty("--tilt-y", `0deg`);
+    }
+  };
 
   return (
-    <>
-      <nav ref={menuRef} className="menu">
-        <div className="first-row">
-          <NavLink to="/">
-            <svg
-              width="15"
-              height="13"
-              viewBox="0 0 15 13"
-              fill="none"
-              className={`home-button ${buttonClassNames}`}
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M2.28261 5.07317L0 7.29268H1.63043V13H6.19565V9.19512H8.80435V13H13.3696V7.29268H15L7.5 0L4.8913 2.53659V0.951219H2.28261V5.07317ZM2.93478 1.58537H4.23913V4.06741L7.5 0.896683L13.4257 6.65854H12.7174V12.3659H9.45652V8.56098H5.54348V12.3659H2.28261V6.65854H1.57435L2.93478 5.33571V1.58537Z"
-                fill="currentColor"
-              />
-            </svg>
-          </NavLink>
-          <NavLink to="/about">
-            <svg
-              width="10"
-              height="13"
-              viewBox="0 0 10 13"
-              fill="none"
-              className={`about-button ${buttonClassNames}`}
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <rect
-                x="0.35"
-                y="7.85479"
-                width="9.3"
-                height="5"
-                stroke="currentColor"
-                strokeWidth="0.6"
-              />
-              <rect
-                x="2.35"
-                y="0.35"
-                width="5.49048"
-                height="5.49048"
-                stroke="currentColor"
-                strokeWidth="0.6"
-              />
-            </svg>
-          </NavLink>
-        </div>
-        <div className="second-row">
-          <NavLink to="/dev-work">
-            <svg
-              width="18"
-              height="15"
-              viewBox="0 0 18 15"
-              fill="none"
-              className={`dev-button ${buttonClassNames}`}
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M1 7.56885L6.09669 4.00011"
-                stroke="currentColor"
-                strokeWidth="0.7"
-              />
-              <path
-                d="M1.34851 7.58472L6.4452 11.1535"
-                stroke="currentColor"
-                strokeWidth="0.7"
-              />
-              <path
-                d="M17.45 7.56885L12.3488 4.00011"
-                stroke="currentColor"
-                strokeWidth="0.7"
-              />
-              <path
-                d="M17.1011 7.58472L11.9999 11.1535"
-                stroke="currentColor"
-                strokeWidth="0.7"
-              />
-              <path d="M9 14L11 1" stroke="currentColor" strokeWidth="0.7" />
-            </svg>
-          </NavLink>
-          <NavLink to="/design-work">
-            <svg
-              width="13"
-              height="13"
-              viewBox="0 0 13 13"
-              fill="none"
-              className={`design-button ${buttonClassNames}`}
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M7.48928 1.80178L8.9375 0.353553L12.6464 4.0625L11.1982 5.51072L11.125 5.58395V5.6875V9.57489L2.50169 12.7106L2.14683 12.3558L5.34618 9.15646C5.45696 9.17684 5.57106 9.1875 5.6875 9.1875C6.72303 9.1875 7.5625 8.34806 7.5625 7.3125C7.5625 6.27697 6.72303 5.4375 5.6875 5.4375C4.65197 5.4375 3.8125 6.27697 3.8125 7.3125C3.8125 7.42891 3.82314 7.54302 3.84354 7.65385L0.644226 10.8532L0.289359 10.4983L3.42511 1.875H7.3125H7.41605L7.48928 1.80178Z"
-                stroke="currentColor"
-                strokeWidth="0.5"
-              />
-            </svg>
-          </NavLink>
-        </div>
-      </nav>
-    </>
+    <nav
+      ref={dockRef}
+      className="menu-glass-dock"
+      aria-label="Main navigation"
+      onPointerMove={handlePointerMove}
+      onPointerLeave={resetTilt}
+    >
+      <div className="dock-bg" />
+      <ul className="dock-list">
+        <div ref={holderRef} className="active-holder" aria-hidden="true" />
+        {BUTTONS.map(({ id, label, icon: Icon }) => {
+          const isActive = (active || internalActive) === id;
+            return (
+              <li key={id} className="dock-item">
+                <button
+                  ref={(r) => (btnRefs.current[id] = r)}
+                  type="button"
+                  className={`m-btn${isActive ? " is-active" : ""}`}
+                  aria-pressed={isActive}
+                  data-id={id}
+                  onClick={(e) => handlePress(e, id)}
+                  title={label}
+                >
+                  <span className="btn-inner">
+                    <Icon className="btn-ic" />
+                    <span className="btn-label">{label}</span>
+                  </span>
+                </button>
+              </li>
+            );
+        })}
+      </ul>
+    </nav>
   );
 };
 

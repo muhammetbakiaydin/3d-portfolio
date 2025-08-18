@@ -1,58 +1,360 @@
-.menu {
-  position: fixed;
-  bottom: 48px;
-  left: 48px;
-  z-index: 9999;
-  cursor: pointer;
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  flex-direction: column;
+// Design Tokens
+$blur-md: 24px;
+$blur-lg: 36px;
+$glass-fill: rgba(255,255,255,0.08);
+$border-outer: rgba(255,255,255,0.25);
+$border-inner: rgba(255,255,255,0.45);
+$shadow-strong: 0 12px 32px rgba(0,0,0,0.25), 0 2px 6px rgba(0,0,0,0.18);
+$radius-2xl: 24px;
+$radius-full: 999px;
+$timing-spring: cubic-bezier(.2,.8,.2,1);
+$holder-bg: rgba(255,255,255,0.12);
+$holder-border-outer: rgba(255,255,255,0.35);
+$holder-border-inner: rgba(255,255,255,0.55);
 
-  @media (max-width: 768px) {
-    left: 32px;
-    bottom: 32px;
+$accents: (
+  a: #4FACFE,
+  b: #9B50FF,
+  c: #FF6B6B,
+  d: #FFD166,
+  e: #2AF598
+);
+
+@mixin glass-border($outer, $inner) {
+  border: 1px solid $outer;
+  box-shadow: inset 0 0 0 1px $inner;
+}
+
+@function conic-accent() {
+  @return conic-gradient(from 0deg,
+    map-get($accents,a),
+    map-get($accents,b),
+    map-get($accents,c),
+    map-get($accents,d),
+    map-get($accents,e),
+    map-get($accents,a)
+  );
+}
+
+// Noise data URI (tiny)
+$noise: url("data:image/svg+xml;utf8,\
+<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'>\
+<filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/></filter>\
+<rect width='80' height='80' filter='url(%23n)' opacity='0.12'/>\
+</svg>");
+
+.menu-glass-dock {
+  position: fixed;
+  left: 50%;
+  bottom: clamp(12px, env(safe-area-inset-bottom) + 12px, 28px);
+  transform: translateX(-50%);
+  z-index: 50;
+  width: fit-content;
+  max-width: 720px;
+  min-width: 320px;
+  padding: 12px 20px;
+  border-radius: $radius-full;
+  isolation: isolate;
+  --holder-left: 0px;
+  --holder-width: 0px;
+
+  .dock-bg {
+    position: absolute;
+    inset: 0;
+    background: $glass-fill;
+    backdrop-filter: blur($blur-lg) saturate(170%);
+    -webkit-backdrop-filter: blur($blur-lg) saturate(170%);
+    @include glass-border($border-outer, $border-inner);
+    border-radius: inherit;
+    overflow: hidden;
+    box-shadow: $shadow-strong;
+    &::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(255,255,255,0.22), rgba(255,255,255,0) 60%);
+      mix-blend-mode: screen;
+      pointer-events: none;
+    }
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: $noise;
+      opacity: .4;
+      mix-blend-mode: overlay;
+      pointer-events: none;
+    }
+  }
+
+  // Aurora blobs
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    width: 420px;
+    height: 420px;
+    border-radius: 50%;
+    filter: blur(110px);
+    opacity: .65;
+    z-index: -2;
+    animation: drift 26s ease-in-out infinite;
+    background: radial-gradient(circle at 30% 30%, map-get($accents,a), transparent 70%),
+      radial-gradient(circle at 70% 60%, map-get($accents,c), transparent 70%),
+      radial-gradient(circle at 50% 80%, map-get($accents,e), transparent 75%);
+  }
+  &::after {
+    animation-direction: reverse;
+    transform: translate(30%,10%);
+    mix-blend-mode: plus-lighter;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &::before,
+    &::after {
+      animation: none;
+    }
+  }
+
+  @keyframes drift {
+    0% { transform: translate(-10%,0) scale(1); }
+    50% { transform: translate(8%,6%) scale(1.08); }
+    100% { transform: translate(-10%,0) scale(1); }
   }
 }
 
-.nav-button {
-  z-index: 100;
-  cursor: pointer;
+.dock-list {
+  position: relative;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+  justify-content: space-between;
+  min-height: 56px;
+}
 
-  height: 32px;
-  width: 32px;
+.dock-item {
+  position: relative;
+  flex: 1 1 0;
+  display: flex;
+}
+
+.m-btn {
+  --tilt-x: 0deg;
+  --tilt-y: 0deg;
+  position: relative;
+  flex: 1;
   border: none;
   outline: none;
+  cursor: pointer;
+  border-radius: $radius-2xl;
+  padding: 10px 20px 8px;
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur($blur-md) saturate(160%);
+  -webkit-backdrop-filter: blur($blur-md) saturate(160%);
+  @include glass-border($border-outer, rgba(255,255,255,0.18));
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: transparent;
-  transition: background-color 0.4s, color 0.4s, border 0.4s;
-  border: 1px solid white;
-  color: white;
-  padding: 8px;
+  min-width: 0;
+  min-height: 56px;
+  color: #111;
+  font: 500 13px/1.1 system-ui, sans-serif;
+  letter-spacing: .25px;
+  position: relative;
+  overflow: hidden;
+  transition: transform .4s $timing-spring, background .4s, box-shadow .4s, color .4s;
+  transform: perspective(600px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y));
+  -webkit-tap-highlight-color: transparent;
 
-  &:hover {
-    cursor: pointer;
-    color: #060606;
-    background-color: white;
+  .btn-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    pointer-events: none;
+  }
+  .btn-ic {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    transition: filter .4s, transform .35s $timing-spring;
+  }
+  .btn-label {
+    white-space: nowrap;
+    transition: opacity .35s, transform .35s;
   }
 
-  &.light {
-    color: #060606;
-    border: 1px solid #060606;
-    background-color: transparent;
+  &:hover,
+  &:focus-visible {
+    background: rgba(255,255,255,0.1);
+    transform: translateY(-2px) perspective(600px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y)) scale(1.02);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.25), 0 1px 3px rgba(0,0,0,0.4);
+  }
 
-    &:hover {
-      color: white;
-      background-color: #080808;
-    }
+  &:focus-visible {
+    box-shadow:
+      0 0 0 2px rgba(255,255,255,0.8),
+      0 0 0 4px rgba(255,255,255,0.25),
+      0 0 0 6px map-get($accents,b);
+  }
+
+  &.is-active {
+    color: #000;
+    .btn-ic { transform: scale(1.06); }
+  }
+
+  &.wobble .btn-ic {
+    animation: wobble .22s ease;
+  }
+
+  @keyframes wobble {
+    0% { transform: scale(1) rotate(0deg); }
+    30% { transform: scale(1.12) rotate(4deg); }
+    70% { transform: scale(1.05) rotate(-3deg); }
+    100% { transform: scale(1.06) rotate(0deg); }
+  }
+
+  // Ripple
+  .m-ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(circle at center, rgba(255,255,255,0.35), rgba(255,255,255,0) 70%);
+    opacity: 0;
+    transform: scale(.2);
+    pointer-events: none;
+  }
+  .m-ripple.run {
+    animation: ripple .6s ease-out forwards;
+  }
+  @keyframes ripple {
+    to { opacity: 0; transform: scale(1); }
+    40% { opacity: .5; }
   }
 }
 
-.first-row,
-.second-row {
-  display: flex;
-  justify-content: column;
-  gap: 12px;
+.active-holder {
+  position: absolute;
+  top: 0;
+  left: var(--holder-left);
+  width: var(--holder-width);
+  height: 100%;
+  pointer-events: none;
+  border-radius: $radius-2xl;
+  background: $holder-bg;
+  backdrop-filter: blur(32px) saturate(180%);
+  -webkit-backdrop-filter: blur(32px) saturate(180%);
+  @include glass-border($holder-border-outer, $holder-border-inner);
+  box-shadow:
+    inset 0 -1px 6px rgba(0,0,0,0.15),
+    0 0 0 1px rgba(255,255,255,0.15),
+    0 0 24px 8px rgba(255,255,255,0.08),
+    0 0 48px -8px rgba(0,0,0,0.35);
+  transition:
+    left .55s $timing-spring,
+    width .55s $timing-spring,
+    transform .55s $timing-spring;
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    padding: 1px;
+    border-radius: inherit;
+    background: conic-accent();
+    mask: linear-gradient(#000,#000) content-box, linear-gradient(#000,#000);
+    -webkit-mask: linear-gradient(#000,#000) content-box, linear-gradient(#000,#000);
+    mask-composite: exclude;
+    -webkit-mask-composite: xor;
+    opacity: .9;
+    mix-blend-mode: plus-lighter;
+    pointer-events: none;
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 30% 20%, rgba(255,255,255,0.35), transparent 60%),
+      linear-gradient(180deg, rgba(255,255,255,0.25), rgba(255,255,255,0) 65%);
+    mix-blend-mode: screen;
+    opacity: .65;
+    pointer-events: none;
+  }
 }
+
+// Active accent ring (drawn by pseudo on active button)
+.m-btn.is-active::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: conic-accent();
+  opacity: .9;
+  mask: radial-gradient(circle at center, rgba(0,0,0,0) 60%, #000 61%);
+  mix-blend-mode: color-dodge;
+  pointer-events: none;
+}
+
+// Dark theme adapt
+@media (prefers-color-scheme: dark) {
+  .m-btn {
+    color: #f5f7fa;
+    .btn-label { color: inherit; }
+    background: rgba(255,255,255,0.07);
+    &.is-active { color: #fff; }
+  }
+  .active-holder {
+    background: rgba(255,255,255,0.16);
+  }
+  .menu-glass-dock .dock-bg {
+    background: rgba(40,40,48,0.28);
+  }
+}
+
+// Reduced motion
+@media (prefers-reduced-motion: reduce) {
+  .m-btn,
+  .active-holder {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+// Very small screens: hide inactive labels
+@media (max-width: 480px) {
+  .m-btn .btn-label {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  .m-btn.is-active .btn-label {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .menu-glass-dock {
+    padding: 10px 14px;
+    min-width: 0;
+  }
+}
+
+// Backdrop-filter fallback
+@supports not ((backdrop-filter: blur(10px)) or (-webkit-backdrop-filter: blur(10px))) {
+  .menu-glass-dock .dock-bg,
+  .m-btn,
+  .active-holder {
+    background: rgba(255,255,255,0.15);
+    box-shadow: $shadow-strong;
+  }
+}
+
+// High contrast ensures readability
+@mixin force-contrast($sel) {
+  #{$sel} {
+    text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+  }
+}
+@include force-contrast(".m-btn");

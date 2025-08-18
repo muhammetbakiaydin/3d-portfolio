@@ -5,9 +5,9 @@ import "./NotFoundPage.scss";
 const NotFoundPage = () => {
   return (
     <div className="not-found-page">
-      <h1>Page Not Found</h1>
-      <p>BRO THIS AIn'T NO PAGE!</p>
-      <Link to="/">Return to Home</Link>
+      <h1>Sayfa bulunamadı</h1>
+      <p>Amacın ne kardeş, yok bişi işte karıştırma!</p>
+      <Link to="/">Ana Sayfaya Dön</Link>
     </div>
   );
 };
