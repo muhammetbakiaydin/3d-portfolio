@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./Menu.scss";
+import { useNavigate } from "react-router-dom"; // added
 
 const ITEMS = [
   { id: "home", label: "Ana Sayfa", icon: HomeIcon },
@@ -9,10 +10,17 @@ const ITEMS = [
 
 export default function Menu({ active: initial = "home", onChange }) {
   const [active, setActive] = useState(initial);
+  const navigate = useNavigate(); // added
+
+  const PATHS = {
+    design: "/design-work",
+    // you can add others later
+  };
 
   const handleClick = (id) => {
     setActive(id);
     onChange && onChange(id);
+    if (PATHS[id]) navigate(PATHS[id]); // navigate for mapped ids
   };
 
   return (
