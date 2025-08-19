@@ -1,216 +1,114 @@
-/* macOS Dock inspired */
-/* --- Tokens --- */
-:root {
-  --icon-base: clamp(44px, 6vw, 80px);
-  --icon-gap: 8px;
-  --dock-radius: clamp(18px, calc(0.35 * var(--icon-base)), 28px);
-  --blur-shelf: 30px;
-  --shelf-grad: linear-gradient(180deg,
-      rgba(255,255,255,0.22) 0%,
-      rgba(255,255,255,0.10) 60%,
-      rgba(255,255,255,0.06) 100%);
-  --border-outer: rgba(255,255,255,0.18);
-  --border-gloss: rgba(255,255,255,0.45);
-  --border-shade: rgba(0,0,0,0.18);
-  --shadow-strong: 0 12px 32px rgba(0,0,0,0.35);
-  --shadow-soft: 0 2px 8px rgba(0,0,0,0.25);
-  --indicator-size: max(3px, calc(var(--icon-base) * 0.06));
-  --bounce-height: calc(var(--icon-base) * 0.15);
+/* ===== Tokens ===== */
+:root{
+  --dock-h: 76px;
+  --radius-dock: 15px;
+  --radius-chip: 15px;
+
+  --blur-dock: 32px;
+  --blur-chip: 24px;
+
+  --glass-fill: rgba(255,255,255,.08);
+  --chip-fill:  rgba(255,255,255,.06);
+
+  --border-outer: rgba(255,255,255,.22);
+  --border-inner: rgba(255,255,255,.45);
+
+  --shadow-strong: 0 12px 32px rgba(0,0,0,.25);
+  --shadow-soft:   0  6px 16px rgba(0,0,0,.18);
+
+  --gap: 12px;
 }
 
-/* --- Shelf / Dock Container --- */
-.menu-glass-dock {
+/* ===== Dock (perfect pill) ===== */
+.menu-glass-dock{
   position: fixed;
   left: 50%;
   bottom: calc(env(safe-area-inset-bottom) + 16px);
   transform: translateX(-50%);
   z-index: 50;
-  padding: 12px 20px;
-  border-radius: var(--dock-radius);
-  background: var(--shelf-grad);
-  backdrop-filter: saturate(180%) blur(var(--blur-shelf));
-  -webkit-backdrop-filter: saturate(180%) blur(var(--blur-shelf));
-  border: 1px solid var(--border-outer);
-  box-shadow: var(--shadow-strong), var(--shadow-soft),
-    inset 0 1px 0 var(--border-gloss),
-    inset 0 -1px 0 var(--border-shade);
+
+  height: var(--dock-h);
+  padding: 8px;
+  border-radius: var(--radius-dock);
   overflow: hidden;
-  max-width: 90vw;
-  transition: transform 200ms ease;
-  &.auto-hide:not(.dock-visible) {
-    transform: translate(-50%, 60%);
-  }
-  &.auto-hide.dock-visible {
-    transform: translate(-50%, 0);
-  }
-  @media (prefers-reduced-motion: reduce) {
-    transition: none;
+
+  background: var(--glass-fill);
+  backdrop-filter: blur(var(--blur-dock));
+  -webkit-backdrop-filter: blur(var(--blur-dock));
+  border: 1px solid var(--border-outer);
+  box-shadow: var(--shadow-strong), var(--shadow-soft);
+
+  &, &::before, &::after{
+    background-image: none !important; /* eski renkli katmanlar kapanır */
   }
 }
 
-/* ===== Buttons (labels always beside icons) ===== */
+/* ===== İç düzen ===== */
+.dock-list{
+  height: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--gap);
+  margin: 0; padding: 0; list-style: none;
+}
+
+/* ===== Buttons (labels always beside icons) ===== 222323*/
 .dock-item{ display: flex; }
 
 .m-btn{
   position: relative;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  height: calc(var(--icon-base) * 1.1);
-  min-width: 200px;
-  display: block; /* we will absolutely position children */
-  white-space: nowrap;
-}
+  display: inline-flex;
+  flex-direction: row;          /* <- yazılar yanında */
+  align-items: center;
+  gap: 8px;
 
-/* Each item is just a positioning wrapper */
-.dock-item {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  /* left set in JS on button */
-  pointer-events: none; /* button handles events */
-}
-
-/* --- Button / Icon Wrapper --- */
-.m-btn {
-  all: unset;
-  position: absolute;
-  top: 50%;
-  transform: translate(-50%, -50%) scale(1);
-  transform-origin: center bottom;
-  width: var(--icon-base);
-  height: var(--icon-base);
+  padding: 10px 16px;
+  border-radius: var(--radius-chip);
+  background: var(--chip-fill);
+  backdrop-filter: blur(var(--blur-chip));
+  -webkit-backdrop-filter: blur(var(--blur-chip));
+  border: 1px solid var(--border-outer);
+  color: #fff;
+  font-weight: 600; letter-spacing: .2px; line-height: 1;
   cursor: pointer;
-  pointer-events: auto;
-  display: block;
-  outline: none;
-  border-radius: calc(var(--icon-base) * 0.18);
-  -webkit-tap-highlight-color: transparent;
-  /* remove old backgrounds */
-  background: none !important;
-  transition: filter 120ms ease;
-  &:focus-visible {
-    box-shadow:
-      0 0 0 2px rgba(255,255,255,0.85),
-      0 0 0 4px rgba(0,0,0,0.35);
-  }
-  /* active surface overlay */
-  &::after {
+  transition: transform 140ms ease, box-shadow 140ms ease;
+
+  .btn-ic{ width: 20px; height: 20px; display: grid; place-items: center; }
+  .btn-label{ white-space: nowrap; }
+
+  /* Her ihtimale karşı olası pseudo-blob’ları kapat */
+  &::before{ content: none !important; }
+
+  /* Şeffaf gradient katmanı (sadece aktif/press'te görünür) */
+  &::after{
     content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
+    position: absolute; inset: 0; border-radius: inherit;
     pointer-events: none;
     background: linear-gradient(135deg,
-      rgba(255,255,255,0.22),
-      rgba(255,255,255,0.10),
-      rgba(255,255,255,0));
+                 rgba(255,255,255,.22) 0%,
+                 rgba(255,255,255,.10) 55%,
+                 rgba(255,255,255,0) 100%);
     opacity: 0;
-    transition: opacity 160ms ease;
+    transition: opacity 200ms ease;
+    mix-blend-mode: normal; /* renkli görünmez, sadece parlaklık */
   }
-  &.is-active::after,
-  &:active::after {
-    opacity: 1;
-  }
-  /* Bounce */
-  &.bounce {
-    animation: dock-bounce 420ms ease-out;
-  }
+
+  &:hover{ transform: translateY(-2px); }
+  &:active::after{ opacity: 1; }       /* basılı tutarken görünür */
 }
 
-@keyframes dock-bounce {
-  0% { transform: translate(-50%, -50%) scale(var(--bounce-scale,1)); }
-  25% { transform: translate(-50%, calc(-50% - var(--bounce-height))) scale(var(--bounce-scale,1)); }
-  55% { transform: translate(-50%, -50%) scale(var(--bounce-scale,1)); }
-  75% { transform: translate(-50%, calc(-50% - calc(var(--bounce-height)*0.4))) scale(var(--bounce-scale,1)); }
-  100% { transform: translate(-50%, -50%) scale(var(--bounce-scale,1)); }
+/* Aktif buton: sadece kenar ve gradient */
+.m-btn.is-active{
+  border-color: rgba(255,255,255,.38);
+}
+.m-btn.is-active::after{ opacity: 1; }  /* tıklanmış/aktif durumda gradient açık */
+
+/* Light mode metin rengi */
+@media (prefers-color-scheme: light){
+  .menu-glass-dock, .m-btn{ color: #111; }
 }
 
-/* Icon layers */
-.icon-layer {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  display: grid;
-  place-items: center;
+/* Hareket azaltma */
+@media (prefers-reduced-motion: reduce){
+  .m-btn{ transition: none !important; }
 }
-
-.icon-img,
-.icon-reflection {
-  position: absolute;
-  left: 0; top: 0;
-  width: 100%; height: 100%;
-  display: grid;
-  place-items: center;
-  svg {
-    width: 70%;
-    height: 70%;
-  }
-}
-
-/* Reflection */
-.icon-reflection {
-  transform: translateY(100%) scaleY(-1);
-  opacity: .25;
-  mask-image: linear-gradient(180deg, rgba(0,0,0,0.4), transparent 70%);
-  -webkit-mask-image: linear-gradient(180deg, rgba(0,0,0,0.4), transparent 70%);
-  pointer-events: none;
-  filter: blur(1px);
-}
-
-@media (max-width: 480px) {
-  .icon-reflection { display: none; }
-}
-
-/* Running indicator dot */
-.run-indicator {
-  position: absolute;
-  bottom: 4px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: var(--indicator-size);
-  height: var(--indicator-size);
-  background: rgba(255,255,255,0.9);
-  border-radius: 50%;
-  box-shadow: 0 0 4px 2px rgba(255,255,255,0.6);
-  pointer-events: none;
-}
-
-/* Hidden accessible label */
-.btn-label {
-  position: absolute !important;
-  width: 1px; height: 1px;
-  padding: 0; margin: -1px;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  white-space: nowrap;
-  border: 0;
-}
-
-/* Light/Dark contrast */
-@media (prefers-color-scheme: light) {
-  .menu-glass-dock { color: #111; }
-  .m-btn svg { color: #111; fill: currentColor; }
-}
-@media (prefers-color-scheme: dark) {
-  .menu-glass-dock { color: #fff; }
-  .m-btn svg { color: #fff; fill: currentColor; }
-}
-
-/* Reduced motion: disable bounce + dynamic transforms (JS sets scale=1 anyway) */
-@media (prefers-reduced-motion: reduce) {
-  .m-btn, .menu-glass-dock {
-    transition: none !important;
-    animation: none !important;
-  }
-  .m-btn { transform: translate(-50%, -50%) scale(1) !important; }
-}
-
-/* Tooltip (simple via title attribute; optionally could style custom) */
-/* Optional auto-hide base state */
-.menu-glass-dock.auto-hide {
-  transform: translate(-50%, 60%);
-}
-
-/* Ensure no legacy holder classes linger */
-.active-holder, .holder { display: none !important; }
