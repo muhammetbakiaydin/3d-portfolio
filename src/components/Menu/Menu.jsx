@@ -134,4 +134,57 @@ export default function Menu({
       setUncontrolledActive(id);
       onChange && onChange(id);
     }
-    if
+        // (removed incomplete 'if' statement)
+      }
+    
+      return (
+        <nav
+          className="menu-dock"
+          ref={dockRef}
+          onPointerMove={handlePointerMove}
+          onPointerLeave={handlePointerLeave}
+          style={{ position: "relative" }}
+        >
+          <div className="menu-dock-inner" style={{ width: "var(--dock-inner-width)" }}>
+            {APPS.map((app, i) => {
+              const Icon = app.icon;
+              const isActive = active === app.id;
+              const isOpen = openApps.includes(app.id);
+              return (
+                <button
+                  key={app.id}
+                  ref={el => (btnRefs.current[app.id] = el)}
+                  className={`menu-dock-btn${isActive ? " active" : ""}${isOpen ? " open" : ""}`}
+                  aria-label={app.label}
+                  onClick={() => handleActivate(app.id)}
+                  tabIndex={0}
+                  type="button"
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: baseSizeRef.current,
+                    height: baseSizeRef.current,
+                    background: "none",
+                    border: "none",
+                    outline: "none",
+                    cursor: "pointer",
+                    transition: prefersReducedMotion ? "none" : "box-shadow 0.2s"
+                  }}
+                >
+                  <Icon
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      display: "block"
+                    }}
+                  />
+                  <span className="menu-dock-label">{app.label}</span>
+                  {isOpen && <span className="menu-dock-indicator" />}
+                </button>
+              );
+            })}
+          </div>
+        </nav>
+      );
+    }
