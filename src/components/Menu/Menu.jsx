@@ -1,6 +1,4 @@
-import React, { useState } from "react";
 import "./Menu.scss";
-import { useNavigate } from "react-router-dom"; // added
 
 const ITEMS = [
   { id: "home", label: "Ana Sayfa", icon: HomeIcon },
