@@ -4,9 +4,7 @@ import "./DesignWorkPage.scss";
 
 const DesignWorkPage = () => {
   const folders = [
-    "Accessibility","Accounts","AppleMediaServices","Application Scripts","Application Support",
-    "Assistant","Assistants","Audio","Autosave Information","Biome","Caches","Calendars",
-    "CallServices","CloudStorage","ColorPickers","Colors"
+    "Accessibility", "Application Support", "Biome"
   ];
   const [selected, setSelected] = React.useState(folders[0]);
 
@@ -64,10 +62,6 @@ const DesignWorkPage = () => {
 
   return (
     <>
-      {/* Removed: <Page ... /> block */}
-
-      {/* Removed: inline Finder mock (.finder-demo) */}
-
       {finderOpen && createPortal(
         <div
           className="finder-overlay"
@@ -115,9 +109,6 @@ const DesignWorkPage = () => {
                   </button>
                 </div>
               </div>
-              <div className="fw-search">
-                <input type="search" placeholder="Search" aria-label="Search" />
-              </div>
             </div>
 
             <div className="fw-body">
@@ -162,7 +153,6 @@ const DesignWorkPage = () => {
             </div>
           </div>
 
-          {/* Minimal CSS injected here so we don't touch SCSS in this change */}
           <style>{`
             .no-select, .no-select * { user-select: none !important; }
             .finder-overlay {
@@ -173,10 +163,13 @@ const DesignWorkPage = () => {
             }
             .finder-overlay .finder-window {
               position: fixed; width: 720px; height: 520px;
-              border-radius: 14px; overflow: hidden;
+              border-radius: 12px; overflow: hidden;
               background: linear-gradient(#f6f6f8, #ebebee);
               box-shadow: 0 24px 80px rgba(0,0,0,0.28), 0 6px 20px rgba(0,0,0,0.18);
               will-change: left, top;
+              font-family: -apple-system, system-ui, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+              -webkit-font-smoothing: antialiased;
+              text-rendering: optimizeLegibility;
             }
             .finder-overlay .fw-titlebar {
               display: grid; grid-template-columns: auto 1fr auto;
@@ -191,21 +184,74 @@ const DesignWorkPage = () => {
             .finder-overlay .tl-red { background:#ff5f57; }
             .finder-overlay .tl-yellow { background:#febc2e; }
             .finder-overlay .tl-green { background:#28c840; }
-            .finder-overlay .fw-title { text-align: center; font-weight: 600; color: #2e2e33; }
+            .finder-overlay .fw-title { text-align: center; font-weight: 600; font-size: 14px; color: #2e2e33; }
             .finder-overlay .fw-close {
               appearance: none; border: 0; background: transparent;
               font-size: 20px; line-height: 1; width: 32px; height: 32px;
               border-radius: 8px; cursor: pointer; color: #333;
             }
             .finder-overlay .fw-close:hover { background: rgba(0,0,0,.06); }
-            .finder-overlay .fw-toolbar { padding: 8px 12px; background: #f0f0f3; border-bottom: 1px solid #e3e3e7; }
+            .finder-overlay .fw-toolbar { 
+              padding: 8px 12px; 
+              background: #f0f0f3; 
+              border-bottom: 1px solid #e3e3e7; 
+              display: flex; 
+              align-items: center; 
+            }
+            .finder-overlay .fw-nav { display: flex; align-items: center; gap: 8px; }
+            .finder-overlay .tool {
+              appearance: none; border: 0; background: transparent;
+              width: 28px; height: 28px; border-radius: 6px; cursor: pointer;
+              display: flex; align-items: center; justify-content: center;
+              color: #666;
+            }
+            .finder-overlay .tool:hover { background: rgba(0,0,0,.06); }
+            .finder-overlay .segmented { display: flex; border-radius: 6px; overflow: hidden; margin-left: 12px; }
+            .finder-overlay .seg {
+              appearance: none; border: 0; background: #fff;
+              width: 32px; height: 24px; cursor: pointer;
+              display: flex; align-items: center; justify-content: center;
+              color: #666; border-right: 1px solid #ddd;
+            }
+            .finder-overlay .seg:last-child { border-right: 0; }
+            .finder-overlay .seg.on { background: #007aff; color: white; }
             .finder-overlay .fw-body { display: grid; grid-template-columns: 240px 1fr; height: calc(100% - 44px - 42px); }
             .finder-overlay .fw-sidebar { background:#f7f7fa; border-right:1px solid #ececf0; padding:16px 12px; overflow:auto; }
+            .finder-overlay .sb-section { 
+              font-size: 11px; font-weight: 600; color: #8e8e93; 
+              text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; 
+            }
+            .finder-overlay .sb-list { list-style: none; margin: 0 0 20px 0; padding: 0; }
+            .finder-overlay .sb-item { 
+              display: flex; align-items: center; gap: 8px; 
+              padding: 4px 8px; border-radius: 6px; cursor: pointer;
+              font-size: 13px; font-weight: 500; color: #1d1d1f;
+            }
+            .finder-overlay .sb-item:hover { background: rgba(0,0,0,.04); }
+            .finder-overlay .sb-item.is-active { background: #007aff; color: white; }
+            .finder-overlay .sb-dot { width: 8px; height: 8px; border-radius: 50%; background: #888; }
             .finder-overlay .fw-content { padding: 20px 24px; overflow:auto; }
-            .finder-overlay .grid { display:grid; grid-template-columns: repeat(4, minmax(130px, 1fr)); gap: 40px 48px; align-content: start; }
-            .finder-overlay .grid-item { background: transparent; border:0; text-align:center; cursor: pointer; position: relative; }
-            .finder-overlay .grid-item.is-selected::before {
-              content:""; position:absolute; inset:-12px -10px; border-radius:12px; background:rgba(0,0,0,.06);
+            .finder-overlay .grid { display:grid; grid-template-columns: repeat(3, 1fr); gap: 40px 48px; align-content: start; }
+            .finder-overlay .grid-item { 
+              background: transparent; border:0; text-align:center; cursor: pointer; 
+              position: relative; padding: 12px; border-radius: 8px;
+              display: flex; flex-direction: column; align-items: center; gap: 8px;
+            }
+            .finder-overlay .grid-item:hover { background: rgba(0,0,0,.03); }
+            .finder-overlay .grid-item.is-selected { background: rgba(0,0,0,.06); }
+            .finder-overlay .folder-icon {
+              width: 64px; height: 64px; background: #4A90E2;
+              border-radius: 8px; display: block;
+              position: relative;
+            }
+            .finder-overlay .folder-icon::before {
+              content: "📁"; font-size: 48px; 
+              position: absolute; top: 50%; left: 50%;
+              transform: translate(-50%, -50%);
+            }
+            .finder-overlay .label { 
+              font-size: 12px; font-weight: 500; color: #1d1d1f;
+              max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
             }
           `}</style>
         </div>,
