@@ -8,12 +8,17 @@ const DesignWorkPage = () => {
   ];
   const [selected, setSelected] = React.useState(folders[0]);
 
-  // NEW: overlay open + drag state
+  // Library window state
   const [finderOpen, setFinderOpen] = React.useState(true);
   const [pos, setPos] = React.useState({ x: 0, y: 0 });
   const dragRef = React.useRef({
     startX: 0, startY: 0, baseX: 0, baseY: 0, dragging: false
   });
+
+  // Portfolio windows state
+  const [portfolioWindows, setPortfolioWindows] = React.useState([]);
+  const [topZIndex, setTopZIndex] = React.useState(10000);
+  const portfolioDragRef = React.useRef({});
 
   React.useEffect(() => {
     // center window on first paint (match CSS width/height)
@@ -21,6 +26,7 @@ const DesignWorkPage = () => {
     setPos({ x: (window.innerWidth - W) / 2, y: (window.innerHeight - H) / 2 });
   }, []);
 
+  // Library window drag handlers
   const onTitleDown = (e) => {
     const p = "touches" in e ? e.touches[0] : e;
     dragRef.current = {
@@ -59,6 +65,91 @@ const DesignWorkPage = () => {
       window.removeEventListener("touchend", up);
     };
   }, []);
+
+  // Portfolio window handlers
+  const openPortfolioWindow = (folderName) => {
+    const id = Date.now();
+    const newWindow = {
+      id,
+      title: "Portfolio",
+      folder: folderName,
+      pos: { 
+        x: (window.innerWidth - 960) / 2 + portfolioWindows.length * 30, 
+        y: (window.innerHeight - 640) / 2 + portfolioWindows.length * 30 
+      },
+      zIndex: topZIndex + 1
+    };
+    setPortfolioWindows(prev => [...prev, newWindow]);
+    setTopZIndex(prev => prev + 1);
+  };
+
+  const closePortfolioWindow = (id) => {
+    setPortfolioWindows(prev => prev.filter(w => w.id !== id));
+  };
+
+  const bringToFront = (id) => {
+    const newZIndex = topZIndex + 1;
+    setPortfolioWindows(prev => prev.map(w => 
+      w.id === id ? { ...w, zIndex: newZIndex } : w
+    ));
+    setTopZIndex(newZIndex);
+  };
+
+  const onPortfolioTitleDown = (e, id) => {
+    const p = "touches" in e ? e.touches[0] : e;
+    const window = portfolioWindows.find(w => w.id === id);
+    if (!window) return;
+    
+    portfolioDragRef.current[id] = {
+      startX: p.pageX,
+      startY: p.pageY,
+      baseX: window.pos.x,
+      baseY: window.pos.y,
+      dragging: true
+    };
+    document.body.classList.add("no-select");
+    bringToFront(id);
+  };
+
+  React.useEffect(() => {
+    const move = (e) => {
+      const p = e.touches ? e.touches[0] : e;
+      Object.keys(portfolioDragRef.current).forEach(id => {
+        const drag = portfolioDragRef.current[id];
+        if (!drag?.dragging) return;
+        
+        const x = drag.baseX + (p.pageX - drag.startX);
+        const y = drag.baseY + (p.pageY - drag.startY);
+        
+        setPortfolioWindows(prev => prev.map(w =>
+          w.id === parseInt(id) ? { ...w, pos: { x, y } } : w
+        ));
+      });
+      if (Object.values(portfolioDragRef.current).some(d => d?.dragging)) {
+        e.preventDefault?.();
+      }
+    };
+
+    const up = () => {
+      Object.keys(portfolioDragRef.current).forEach(id => {
+        if (portfolioDragRef.current[id]) {
+          portfolioDragRef.current[id].dragging = false;
+        }
+      });
+      document.body.classList.remove("no-select");
+    };
+
+    window.addEventListener("mousemove", move, { passive: false });
+    window.addEventListener("mouseup", up);
+    window.addEventListener("touchmove", move, { passive: false });
+    window.addEventListener("touchend", up);
+    return () => {
+      window.removeEventListener("mousemove", move);
+      window.removeEventListener("mouseup", up);
+      window.removeEventListener("touchmove", move);
+      window.removeEventListener("touchend", up);
+    };
+  }, [portfolioWindows]);
 
   return (
     <>
@@ -140,7 +231,10 @@ const DesignWorkPage = () => {
                       key={name}
                       type="button"
                       className={`grid-item${selected===name ? " is-selected":""}`}
-                      onClick={()=>setSelected(name)}
+                      onClick={() => {
+                        setSelected(name);
+                        openPortfolioWindow(name);
+                      }}
                       aria-pressed={selected===name}
                       title={name}
                     >
@@ -257,6 +351,118 @@ const DesignWorkPage = () => {
         </div>,
         document.body
       )}
+
+      {/* Portfolio Windows */}
+      {portfolioWindows.map(window => createPortal(
+        <div
+          key={window.id}
+          className="portfolio-window"
+          style={{ 
+            left: window.pos.x, 
+            top: window.pos.y,
+            zIndex: window.zIndex
+          }}
+          onMouseDown={() => bringToFront(window.id)}
+          onTouchStart={() => bringToFront(window.id)}
+        >
+          <div
+            className="pw-titlebar"
+            onMouseDown={(e) => onPortfolioTitleDown(e, window.id)}
+            onTouchStart={(e) => onPortfolioTitleDown(e, window.id)}
+          >
+            <div className="traffic">
+              <span className="tl tl-red" />
+              <span className="tl tl-yellow" />
+              <span className="tl tl-green" />
+            </div>
+            <div className="pw-title">{window.title}</div>
+            <button 
+              className="pw-close" 
+              onClick={() => closePortfolioWindow(window.id)} 
+              aria-label="Close"
+            >×</button>
+          </div>
+
+          <div className="pw-content">
+            <div className="iframe-wrapper">
+              <iframe
+                src="https://www.behance.net/embed/project/227112863?ilo0=1"
+                allowFullScreen
+                loading="lazy"
+                frameBorder="0"
+                allow="clipboard-write"
+                referrerPolicy="strict-origin-when-cross-origin"
+                title="Behance Portfolio"
+              />
+            </div>
+          </div>
+
+          <style>{`
+            .portfolio-window {
+              position: fixed; 
+              width: 960px; 
+              height: 640px;
+              border-radius: 12px; 
+              overflow: hidden;
+              background: #fff;
+              box-shadow: 0 24px 80px rgba(0,0,0,0.28), 0 6px 20px rgba(0,0,0,0.18);
+              font-family: -apple-system, system-ui, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+              -webkit-font-smoothing: antialiased;
+              text-rendering: optimizeLegibility;
+            }
+            .pw-titlebar {
+              display: grid; 
+              grid-template-columns: auto 1fr auto;
+              align-items: center; 
+              gap: 8px;
+              height: 44px; 
+              padding: 0 12px;
+              background: linear-gradient(#ededf1, #e4e4e8);
+              border-bottom: 1px solid #dadadd;
+              cursor: move;
+            }
+            .pw-title { 
+              text-align: center; 
+              font-weight: 600; 
+              font-size: 14px; 
+              color: #2e2e33; 
+            }
+            .pw-close {
+              appearance: none; 
+              border: 0; 
+              background: transparent;
+              font-size: 20px; 
+              line-height: 1; 
+              width: 32px; 
+              height: 32px;
+              border-radius: 8px; 
+              cursor: pointer; 
+              color: #333;
+            }
+            .pw-close:hover { 
+              background: rgba(0,0,0,.06); 
+            }
+            .pw-content {
+              height: calc(100% - 44px);
+              padding: 0;
+            }
+            .iframe-wrapper {
+              position: relative;
+              width: 100%;
+              height: 100%;
+            }
+            .iframe-wrapper iframe {
+              position: absolute;
+              top: 0;
+              left: 0;
+              width: 100%;
+              height: 100%;
+              border: 0;
+            }
+          `}</style>
+        </div>,
+        document.body
+      ))}
     </>
   );
 };
