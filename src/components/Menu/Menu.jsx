@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import "./Menu.scss";
 
 const ITEMS = [
@@ -8,7 +9,12 @@ const ITEMS = [
 
 export default function Menu({ active: initial = "home", onChange }) {
   const [active, setActive] = useState(initial);
-  const navigate = useNavigate(); // added
+  // replace react-router navigate with browser navigation (works in Vite and on Vercel)
+  const navigate = (to, { replace } = {}) => {
+    if (!to) return;
+    if (replace) window.location.replace(to);
+    else window.location.assign(to);
+  };
 
   const PATHS = {
     design: "/design-work",
