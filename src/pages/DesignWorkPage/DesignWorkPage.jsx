@@ -131,7 +131,7 @@ const DesignWorkPage = () => {
 
           <div className="fw-body">
             <aside className="fw-sidebar" aria-label="Sidebar">
-              <div className="sb-section">Favorites</div>
+              <div className="sb-section">Favoriler</div>
               <ul className="sb-list">
                 {["AirDrop", "Recents", "Applications", "Downloads", "Shared"].map(
                   (i) => (
