@@ -25,7 +25,7 @@ const DesignWorkPage = () => {
   const finderDragRef = React.useRef({});
 
   // Persona dropdown state
-  const [selectedPersona, setSelectedPersona] = React.useState({ icon: '👽', label: 'As an Alien' });
+  const [selectedPersona, setSelectedPersona] = React.useState({ icon: '👽', label: 'Uzaylı Olarak' });
 
   React.useEffect(() => {
     // Handle clicks outside persona dropdowns to close them
@@ -406,24 +406,7 @@ const DesignWorkPage = () => {
               <button className="fw-close" onClick={() => setFinderOpen(false)} aria-label="Close">×</button>
             </div>
 
-            <div className="fw-toolbar" role="toolbar" aria-label="Window tools">
-              <div className="fw-nav">
-                <button className="tool" aria-label="Back">
-                  <svg width="14" height="14" viewBox="0 0 24 24"><path d="M15 18 9 12l6-6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                </button>
-                <button className="tool" aria-label="Forward">
-                  <svg width="14" height="14" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                </button>
-                <div className="segmented" role="group" aria-label="View">
-                  <button className="seg on" aria-pressed="true">
-                    <svg width="14" height="14" viewBox="0 0 24 24"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z" fill="currentColor"/></svg>
-                  </button>
-                  <button className="seg" aria-pressed="false">
-                    <svg width="14" height="14" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>
-                  </button>
-                </div>
-              </div>
-            </div>
+           
 
             <div className="fw-body">
               <aside className="fw-sidebar" aria-label="Sidebar">
@@ -810,17 +793,7 @@ const DesignWorkPage = () => {
             >×</button>
           </div>
 
-          <div className="sfw-toolbar">
-            <div className="sfw-nav">
-              <button className="tool" aria-label="Back">
-                <svg width="14" height="14" viewBox="0 0 24 24"><path d="M15 18 9 12l6-6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-              </button>
-              <button className="tool" aria-label="Forward">
-                <svg width="14" height="14" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-              </button>
-            </div>
-          </div>
-
+          
           <div className="sfw-content">
             {window.type === "archive" && (
               <div className="archive-content">
@@ -840,7 +813,7 @@ const DesignWorkPage = () => {
                 <div className="contact-grid">
                   <div className="contact-form-column">
                     <div className="form-row">
-                      <label htmlFor="to" className="form-label">To:</label>
+                      <label htmlFor="to" className="form-label">Alıcı:</label>
                       <input 
                         type="text" 
                         id="to" 
@@ -851,7 +824,7 @@ const DesignWorkPage = () => {
                     </div>
                     
                     <div className="form-row">
-                      <label htmlFor="from" className="form-label">From:</label>
+                      <label htmlFor="from" className="form-label">Gönderen :</label>
                       <input 
                         type="email" 
                         id="from" 
@@ -862,9 +835,9 @@ const DesignWorkPage = () => {
                     </div>
                     
                     <div className="form-row">
-                      <label htmlFor="subject" className="form-label">Subject:</label>
+                      <label htmlFor="subject" className="form-label">Konu:</label>
                       <div className="subject-input-wrapper">
-                        <span className="subject-icon">💗</span>
+                        <span className="subject-icon">📝</span>
                         <input 
                           type="text" 
                           id="subject" 
@@ -876,20 +849,20 @@ const DesignWorkPage = () => {
                     </div>
                     
                     <div className="form-row form-row-textarea">
-                      <label htmlFor="message" className="form-label">Message:</label>
+                      <label htmlFor="message" className="form-label">Mesajınız:</label>
                       <textarea 
                         id="message" 
                         name="message" 
                         className="form-textarea"
                         rows="10"
-                        placeholder="Write your message here…"
+                        placeholder="Yazınızı buraya girin..."
                       ></textarea>
                     </div>
                   </div>
                   
                   <div className="contact-actions-column">
                     <button type="submit" className="send-button">
-                      Send
+                      Gönder
                     </button>
                     
                     <div className="persona-dropdown">
@@ -904,7 +877,7 @@ const DesignWorkPage = () => {
                         aria-label="Select persona"
                       >
                         <span className="persona-icon">👽</span>
-                        <span className="persona-label">As an Alien</span>
+                        <span className="persona-label">Uzaylı Olarak</span>
                         <svg className="persona-chevron" width="12" height="12" viewBox="0 0 24 24" aria-hidden="true">
                           <path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                         </svg>
@@ -913,39 +886,39 @@ const DesignWorkPage = () => {
                       <div className="persona-menu" role="listbox" aria-label="Persona options">
                         <button type="button" className="persona-option" data-value="yourself" role="option" aria-selected="false">
                           <span className="persona-icon" aria-hidden="true">👤</span>
-                          <span className="persona-label">As Yourself</span>
+                          <span className="persona-label">Kendin Olarak</span>
                         </button>
                         <button type="button" className="persona-option is-selected" data-value="alien" role="option" aria-selected="true">
                           <span className="persona-icon" aria-hidden="true">👽</span>
-                          <span className="persona-label">As an Alien</span>
+                          <span className="persona-label">Uzaylı Olarak</span>
                         </button>
                         <button type="button" className="persona-option" data-value="cowpoke" role="option" aria-selected="false">
                           <span className="persona-icon" aria-hidden="true">🤠</span>
-                          <span className="persona-label">As a Cowpoke</span>
+                          <span className="persona-label">Kovboy Olarak</span>
                         </button>
                         <button type="button" className="persona-option" data-value="fae" role="option" aria-selected="false">
                           <span className="persona-icon" aria-hidden="true">🧚</span>
-                          <span className="persona-label">As a Fae</span>
+                          <span className="persona-label">Peri Olarak</span>
                         </button>
                         <button type="button" className="persona-option" data-value="knight" role="option" aria-selected="false">
                           <span className="persona-icon" aria-hidden="true">🛡️</span>
-                          <span className="persona-label">As a Knight</span>
+                          <span className="persona-label">Şövalye Olarak</span>
                         </button>
                         <button type="button" className="persona-option" data-value="pirate" role="option" aria-selected="false">
                           <span className="persona-icon" aria-hidden="true">🏴‍☠️</span>
-                          <span className="persona-label">As a Pirate</span>
+                          <span className="persona-label">Korsan Olarak</span>
                         </button>
                         <button type="button" className="persona-option" data-value="poaster" role="option" aria-selected="false">
                           <span className="persona-icon" aria-hidden="true">📰</span>
-                          <span className="persona-label">As a Poaster</span>
+                          <span className="persona-label">Gazeteci Olarak</span>
                         </button>
                         <button type="button" className="persona-option" data-value="poet" role="option" aria-selected="false">
                           <span className="persona-icon" aria-hidden="true">📝</span>
-                          <span className="persona-label">As a Poet</span>
+                          <span className="persona-label">Şair Olarak</span>
                         </button>
                         <button type="button" className="persona-option" data-value="robot" role="option" aria-selected="false">
                           <span className="persona-icon" aria-hidden="true">🤖</span>
-                          <span className="persona-label">As a Robot</span>
+                          <span className="persona-label">Robot Olarak</span>
                         </button>
                       </div>
                     </div>
