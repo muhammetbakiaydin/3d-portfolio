@@ -24,6 +24,123 @@ const DesignWorkPage = () => {
   const [finderWindows, setFinderWindows] = React.useState([]);
   const finderDragRef = React.useRef({});
 
+  // Persona dropdown state
+  const [selectedPersona, setSelectedPersona] = React.useState({ icon: '👽', label: 'As an Alien' });
+
+  React.useEffect(() => {
+    // Handle clicks outside persona dropdowns to close them
+    const handleClickOutside = (e) => {
+      if (!e.target.closest('.persona-dropdown')) {
+        document.querySelectorAll('.persona-dropdown.is-open').forEach(dropdown => {
+          dropdown.classList.remove('is-open');
+          const trigger = dropdown.querySelector('.persona-trigger');
+          if (trigger) trigger.setAttribute('aria-expanded', 'false');
+        });
+      }
+    };
+
+    // Handle persona option selection
+    const handlePersonaSelect = (e) => {
+      const option = e.target.closest('.persona-option');
+      if (option) {
+        const dropdown = option.closest('.persona-dropdown');
+        const trigger = dropdown.querySelector('.persona-trigger');
+        const icon = option.querySelector('.persona-icon').textContent;
+        const label = option.querySelector('.persona-label').textContent;
+        
+        // Update trigger
+        trigger.querySelector('.persona-icon').textContent = icon;
+        trigger.querySelector('.persona-label').textContent = label;
+        
+        // Update selected state and aria-selected
+        dropdown.querySelectorAll('.persona-option').forEach(opt => {
+          opt.classList.remove('is-selected');
+          opt.setAttribute('aria-selected', 'false');
+        });
+        option.classList.add('is-selected');
+        option.setAttribute('aria-selected', 'true');
+        
+        // Close dropdown
+        dropdown.classList.remove('is-open');
+        trigger.setAttribute('aria-expanded', 'false');
+        
+        setSelectedPersona({ icon, label });
+      }
+    };
+
+    // Keyboard navigation for persona dropdown
+    const handleKeyDown = (e) => {
+      const dropdown = e.target.closest('.persona-dropdown');
+      if (!dropdown) return;
+
+      const isOpen = dropdown.classList.contains('is-open');
+      const trigger = dropdown.querySelector('.persona-trigger');
+      const menu = dropdown.querySelector('.persona-menu');
+      const options = Array.from(dropdown.querySelectorAll('.persona-option'));
+
+      // Open/close dropdown with Enter or Space on trigger
+      if (e.target === trigger && (e.key === 'Enter' || e.key === ' ')) {
+        e.preventDefault();
+        const willOpen = !isOpen;
+        dropdown.classList.toggle('is-open');
+        trigger.setAttribute('aria-expanded', willOpen.toString());
+        if (willOpen && options.length > 0) {
+          setTimeout(() => options[0].focus(), 50);
+        }
+      }
+
+      // Close dropdown with Escape
+      if (e.key === 'Escape' && isOpen) {
+        dropdown.classList.remove('is-open');
+        trigger.setAttribute('aria-expanded', 'false');
+        trigger.focus();
+      }
+
+      // Navigate options with arrow keys
+      if (isOpen && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
+        e.preventDefault();
+        const currentIndex = options.indexOf(document.activeElement);
+        let nextIndex;
+
+        if (e.key === 'ArrowDown') {
+          nextIndex = currentIndex < options.length - 1 ? currentIndex + 1 : 0;
+        } else {
+          nextIndex = currentIndex > 0 ? currentIndex - 1 : options.length - 1;
+        }
+
+        options[nextIndex].focus();
+      }
+
+      // Select option with Enter or Space
+      if (e.target.classList.contains('persona-option') && (e.key === 'Enter' || e.key === ' ')) {
+        e.preventDefault();
+        e.target.click();
+      }
+    };
+
+    // Handle dropdown trigger clicks
+    const handleTriggerClick = (e) => {
+      const trigger = e.target.closest('.persona-trigger');
+      if (trigger) {
+        const dropdown = trigger.parentElement;
+        const isOpen = dropdown.classList.contains('is-open');
+        trigger.setAttribute('aria-expanded', (!isOpen).toString());
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    document.addEventListener('click', handlePersonaSelect);
+    document.addEventListener('click', handleTriggerClick);
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+      document.removeEventListener('click', handlePersonaSelect);
+      document.removeEventListener('click', handleTriggerClick);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
   React.useEffect(() => {
     // center window on first paint (match CSS width/height)
     const updatePosition = () => {
@@ -720,26 +837,120 @@ const DesignWorkPage = () => {
 
             {window.type === "contact" && (
               <div className="contact-content">
-                <h2>İletişim</h2>
-                <form className="contact-form" onSubmit={(e) => e.preventDefault()}>
-                  <div className="form-group">
-                    <label htmlFor="name">İsim</label>
-                    <input type="text" id="name" name="name" placeholder="Adınız" />
+                <div className="contact-grid">
+                  <div className="contact-form-column">
+                    <div className="form-row">
+                      <label htmlFor="to" className="form-label">To:</label>
+                      <input 
+                        type="text" 
+                        id="to" 
+                        name="to" 
+                        className="form-input"
+                        defaultValue="Baki Aydin"
+                      />
+                    </div>
+                    
+                    <div className="form-row">
+                      <label htmlFor="from" className="form-label">From:</label>
+                      <input 
+                        type="email" 
+                        id="from" 
+                        name="from" 
+                        className="form-input"
+                        placeholder="Your email address"
+                      />
+                    </div>
+                    
+                    <div className="form-row">
+                      <label htmlFor="subject" className="form-label">Subject:</label>
+                      <div className="subject-input-wrapper">
+                        <span className="subject-icon">💗</span>
+                        <input 
+                          type="text" 
+                          id="subject" 
+                          name="subject" 
+                          className="form-input subject-input"
+                          defaultValue="Personal Note"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="form-row form-row-textarea">
+                      <label htmlFor="message" className="form-label">Message:</label>
+                      <textarea 
+                        id="message" 
+                        name="message" 
+                        className="form-textarea"
+                        rows="10"
+                        placeholder="Write your message here…"
+                      ></textarea>
+                    </div>
                   </div>
-                  <div className="form-group">
-                    <label htmlFor="email">E-posta</label>
-                    <input type="email" id="email" name="email" placeholder="ornek@email.com" />
+                  
+                  <div className="contact-actions-column">
+                    <button type="submit" className="send-button">
+                      Send
+                    </button>
+                    
+                    <div className="persona-dropdown">
+                      <button 
+                        type="button"
+                        className="persona-trigger"
+                        onClick={(e) => {
+                          e.currentTarget.parentElement.classList.toggle('is-open');
+                        }}
+                        aria-haspopup="listbox"
+                        aria-expanded="false"
+                        aria-label="Select persona"
+                      >
+                        <span className="persona-icon">👽</span>
+                        <span className="persona-label">As an Alien</span>
+                        <svg className="persona-chevron" width="12" height="12" viewBox="0 0 24 24" aria-hidden="true">
+                          <path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      </button>
+                      
+                      <div className="persona-menu" role="listbox" aria-label="Persona options">
+                        <button type="button" className="persona-option" data-value="yourself" role="option" aria-selected="false">
+                          <span className="persona-icon" aria-hidden="true">👤</span>
+                          <span className="persona-label">As Yourself</span>
+                        </button>
+                        <button type="button" className="persona-option is-selected" data-value="alien" role="option" aria-selected="true">
+                          <span className="persona-icon" aria-hidden="true">👽</span>
+                          <span className="persona-label">As an Alien</span>
+                        </button>
+                        <button type="button" className="persona-option" data-value="cowpoke" role="option" aria-selected="false">
+                          <span className="persona-icon" aria-hidden="true">🤠</span>
+                          <span className="persona-label">As a Cowpoke</span>
+                        </button>
+                        <button type="button" className="persona-option" data-value="fae" role="option" aria-selected="false">
+                          <span className="persona-icon" aria-hidden="true">🧚</span>
+                          <span className="persona-label">As a Fae</span>
+                        </button>
+                        <button type="button" className="persona-option" data-value="knight" role="option" aria-selected="false">
+                          <span className="persona-icon" aria-hidden="true">🛡️</span>
+                          <span className="persona-label">As a Knight</span>
+                        </button>
+                        <button type="button" className="persona-option" data-value="pirate" role="option" aria-selected="false">
+                          <span className="persona-icon" aria-hidden="true">🏴‍☠️</span>
+                          <span className="persona-label">As a Pirate</span>
+                        </button>
+                        <button type="button" className="persona-option" data-value="poaster" role="option" aria-selected="false">
+                          <span className="persona-icon" aria-hidden="true">📰</span>
+                          <span className="persona-label">As a Poaster</span>
+                        </button>
+                        <button type="button" className="persona-option" data-value="poet" role="option" aria-selected="false">
+                          <span className="persona-icon" aria-hidden="true">📝</span>
+                          <span className="persona-label">As a Poet</span>
+                        </button>
+                        <button type="button" className="persona-option" data-value="robot" role="option" aria-selected="false">
+                          <span className="persona-icon" aria-hidden="true">🤖</span>
+                          <span className="persona-label">As a Robot</span>
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                  <div className="form-group">
-                    <label htmlFor="subject">Konu</label>
-                    <input type="text" id="subject" name="subject" placeholder="Mesaj konusu" />
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="message">Mesaj</label>
-                    <textarea id="message" name="message" rows="6" placeholder="Mesajınızı buraya yazın..."></textarea>
-                  </div>
-                  <button type="submit" className="submit-btn">Gönder</button>
-                </form>
+                </div>
               </div>
             )}
           </div>
@@ -888,86 +1099,318 @@ const DesignWorkPage = () => {
 
             /* Contact Form */
             .contact-content {
-              max-width: 500px;
-              margin: 0 auto;
+              max-width: 100%;
+              margin: 0;
+              height: 100%;
             }
             @media (max-width: 767px) {
               .contact-content {
                 max-width: 100%;
               }
             }
-            .contact-content h2 {
-              font-size: 24px;
-              font-weight: 600;
-              color: #1d1d1f;
-              margin-bottom: 24px;
-              text-align: center;
+            
+            .contact-grid {
+              display: grid;
+              grid-template-columns: 1fr 180px;
+              gap: 24px;
+              height: 100%;
             }
             @media (max-width: 767px) {
-              .contact-content h2 {
-                font-size: 20px;
-                margin-bottom: 16px;
+              .contact-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
               }
             }
-            .contact-form {
+            
+            .contact-form-column {
               display: flex;
               flex-direction: column;
-              gap: 16px;
+              gap: 12px;
             }
-            .form-group {
+            
+            .contact-actions-column {
               display: flex;
               flex-direction: column;
-              gap: 6px;
+              gap: 12px;
             }
-            .form-group label {
+            @media (max-width: 767px) {
+              .contact-actions-column {
+                flex-direction: row;
+                align-items: flex-start;
+              }
+            }
+            
+            .form-row {
+              display: grid;
+              grid-template-columns: 80px 1fr;
+              gap: 12px;
+              align-items: center;
+            }
+            @media (max-width: 767px) {
+              .form-row {
+                grid-template-columns: 70px 1fr;
+                gap: 8px;
+              }
+            }
+            
+            .form-row-textarea {
+              align-items: flex-start;
+            }
+            
+            .form-label {
               font-size: 13px;
               font-weight: 500;
               color: #1d1d1f;
+              text-align: right;
+              padding-top: 2px;
             }
-            .form-group input,
-            .form-group textarea {
+            @media (max-width: 767px) {
+              .form-label {
+                font-size: 12px;
+              }
+            }
+            
+            .form-input {
+              padding: 8px 12px;
+              border: 1px solid #d1d1d6;
+              border-radius: 6px;
+              font-size: 13px;
+              font-family: inherit;
+              background: rgba(255, 255, 255, 0.9);
+              color: #1d1d1f;
+              transition: all 0.2s ease;
+              outline: none;
+            }
+            .form-input:focus {
+              border-color: #007aff;
+              background: #fff;
+              box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+            }
+            .form-input::placeholder {
+              color: #8e8e93;
+            }
+            @media (max-width: 767px) {
+              .form-input {
+                padding: 7px 10px;
+                font-size: 12px;
+              }
+            }
+            
+            .subject-input-wrapper {
+              position: relative;
+              display: flex;
+              align-items: center;
+            }
+            
+            .subject-icon {
+              position: absolute;
+              left: 10px;
+              font-size: 16px;
+              pointer-events: none;
+              z-index: 1;
+            }
+            
+            .subject-input {
+              padding-left: 36px;
+            }
+            
+            .form-textarea {
               padding: 10px 12px;
               border: 1px solid #d1d1d6;
               border-radius: 6px;
-              font-size: 14px;
+              font-size: 13px;
               font-family: inherit;
-              background: #fff;
+              background: rgba(255, 255, 255, 0.9);
               color: #1d1d1f;
-              transition: border-color 0.2s;
+              transition: all 0.2s ease;
+              outline: none;
+              resize: vertical;
+              min-height: 120px;
+            }
+            .form-textarea:focus {
+              border-color: #007aff;
+              background: #fff;
+              box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+            }
+            .form-textarea::placeholder {
+              color: #8e8e93;
             }
             @media (max-width: 767px) {
-              .form-group input,
-              .form-group textarea {
+              .form-textarea {
                 padding: 8px 10px;
-                font-size: 13px;
+                font-size: 12px;
+                min-height: 100px;
               }
             }
-            .form-group input:focus,
-            .form-group textarea:focus {
-              outline: none;
-              border-color: #007aff;
-            }
-            .form-group textarea {
-              resize: vertical;
-              min-height: 100px;
-            }
-            .submit-btn {
-              padding: 12px 24px;
-              background: #007aff;
+            
+            .send-button {
+              width: 100%;
+              padding: 10px 20px;
+              background: linear-gradient(180deg, #007aff 0%, #0051d5 100%);
               color: white;
               border: none;
               border-radius: 8px;
               font-size: 14px;
               font-weight: 600;
               cursor: pointer;
-              transition: background 0.2s;
-              margin-top: 8px;
+              transition: all 0.2s ease;
+              box-shadow: 0 2px 8px rgba(0, 122, 255, 0.25);
+              outline: none;
             }
-            .submit-btn:hover {
-              background: #0051d5;
+            .send-button:hover {
+              background: linear-gradient(180deg, #0051d5 0%, #004fc4 100%);
+              box-shadow: 0 4px 12px rgba(0, 122, 255, 0.35);
+              transform: translateY(-1px);
             }
-            .submit-btn:active {
-              background: #004fc4;
+            .send-button:active {
+              transform: translateY(0);
+              box-shadow: 0 1px 4px rgba(0, 122, 255, 0.3);
+            }
+            .send-button:focus-visible {
+              box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.3);
+            }
+            @media (max-width: 767px) {
+              .send-button {
+                padding: 9px 16px;
+                font-size: 13px;
+                flex: 1;
+              }
+            }
+            
+            /* Persona Dropdown */
+            .persona-dropdown {
+              position: relative;
+            }
+            @media (max-width: 767px) {
+              .persona-dropdown {
+                flex: 1;
+              }
+            }
+            
+            .persona-trigger {
+              width: 100%;
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              padding: 10px 12px;
+              background: rgba(255, 255, 255, 0.9);
+              border: 1px solid #d1d1d6;
+              border-radius: 8px;
+              font-size: 13px;
+              font-weight: 500;
+              color: #1d1d1f;
+              cursor: pointer;
+              transition: all 0.2s ease;
+              outline: none;
+            }
+            .persona-trigger:hover {
+              background: #fff;
+              border-color: #b8b8bd;
+            }
+            .persona-trigger:focus-visible {
+              border-color: #007aff;
+              box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+            }
+            @media (max-width: 767px) {
+              .persona-trigger {
+                padding: 9px 10px;
+                font-size: 12px;
+              }
+            }
+            
+            .persona-icon {
+              font-size: 18px;
+              line-height: 1;
+              flex-shrink: 0;
+            }
+            
+            .persona-label {
+              flex: 1;
+              text-align: left;
+            }
+            
+            .persona-chevron {
+              flex-shrink: 0;
+              color: #8e8e93;
+              transition: transform 0.2s ease;
+            }
+            .persona-dropdown.is-open .persona-chevron {
+              transform: rotate(180deg);
+            }
+            
+            .persona-menu {
+              position: absolute;
+              top: calc(100% + 4px);
+              left: 0;
+              right: 0;
+              background: rgba(255, 255, 255, 0.98);
+              backdrop-filter: blur(20px);
+              -webkit-backdrop-filter: blur(20px);
+              border: 1px solid #d1d1d6;
+              border-radius: 8px;
+              box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15), 0 2px 6px rgba(0, 0, 0, 0.08);
+              opacity: 0;
+              visibility: hidden;
+              transform: translateY(-8px);
+              transition: all 0.2s ease;
+              z-index: 1000;
+              max-height: 320px;
+              overflow-y: auto;
+            }
+            .persona-dropdown.is-open .persona-menu {
+              opacity: 1;
+              visibility: visible;
+              transform: translateY(0);
+            }
+            @media (max-width: 767px) {
+              .persona-menu {
+                position: fixed;
+                left: 10px;
+                right: 10px;
+                top: auto;
+                bottom: 10px;
+                max-height: 50vh;
+              }
+            }
+            
+            .persona-option {
+              width: 100%;
+              display: flex;
+              align-items: center;
+              gap: 10px;
+              padding: 10px 12px;
+              background: transparent;
+              border: none;
+              font-size: 13px;
+              font-weight: 500;
+              color: #1d1d1f;
+              cursor: pointer;
+              transition: background 0.15s ease;
+              outline: none;
+              text-align: left;
+            }
+            .persona-option:hover {
+              background: rgba(0, 122, 255, 0.08);
+            }
+            .persona-option:focus-visible {
+              background: rgba(0, 122, 255, 0.12);
+            }
+            .persona-option.is-selected {
+              background: rgba(0, 122, 255, 0.1);
+              color: #007aff;
+              font-weight: 600;
+            }
+            .persona-option:first-child {
+              border-radius: 7px 7px 0 0;
+            }
+            .persona-option:last-child {
+              border-radius: 0 0 7px 7px;
+            }
+            @media (max-width: 767px) {
+              .persona-option {
+                padding: 12px;
+                font-size: 14px;
+              }
             }
           `}</style>
         </div>,
