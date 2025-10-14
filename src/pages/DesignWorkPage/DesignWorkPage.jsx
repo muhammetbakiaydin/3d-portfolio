@@ -4,7 +4,7 @@ import "./DesignWorkPage.scss";
 
 const DesignWorkPage = () => {
   const folders = [
-    "Accessibility", "Application Support", "Biome"
+    "Behance Portfolyo", "Arşiv", "İletişim"
   ];
   const [selected, setSelected] = React.useState(folders[0]);
 
@@ -19,6 +19,10 @@ const DesignWorkPage = () => {
   const [portfolioWindows, setPortfolioWindows] = React.useState([]);
   const [topZIndex, setTopZIndex] = React.useState(10000);
   const portfolioDragRef = React.useRef({});
+
+  // Finder windows state (for Archive and Contact)
+  const [finderWindows, setFinderWindows] = React.useState([]);
+  const finderDragRef = React.useRef({});
 
   React.useEffect(() => {
     // center window on first paint (match CSS width/height)
@@ -66,6 +70,19 @@ const DesignWorkPage = () => {
     };
   }, []);
 
+  // Handle folder clicks
+  const handleFolderClick = (folderName) => {
+    setSelected(folderName);
+    
+    if (folderName === "Behance Portfolyo") {
+      openPortfolioWindow(folderName);
+    } else if (folderName === "Arşiv") {
+      openFinderWindow(folderName, "archive");
+    } else if (folderName === "İletişim") {
+      openFinderWindow(folderName, "contact");
+    }
+  };
+
   // Portfolio window handlers
   const openPortfolioWindow = (folderName) => {
     const id = Date.now();
@@ -81,6 +98,35 @@ const DesignWorkPage = () => {
     };
     setPortfolioWindows(prev => [...prev, newWindow]);
     setTopZIndex(prev => prev + 1);
+  };
+
+  // Finder window handlers (for Archive and Contact)
+  const openFinderWindow = (folderName, type) => {
+    const id = Date.now();
+    const newWindow = {
+      id,
+      title: folderName,
+      type,
+      pos: { 
+        x: (window.innerWidth - 720) / 2 + finderWindows.length * 30, 
+        y: (window.innerHeight - 520) / 2 + finderWindows.length * 30 
+      },
+      zIndex: topZIndex + 1
+    };
+    setFinderWindows(prev => [...prev, newWindow]);
+    setTopZIndex(prev => prev + 1);
+  };
+
+  const closeFinderWindow = (id) => {
+    setFinderWindows(prev => prev.filter(w => w.id !== id));
+  };
+
+  const bringFinderToFront = (id) => {
+    const newZIndex = topZIndex + 1;
+    setFinderWindows(prev => prev.map(w => 
+      w.id === id ? { ...w, zIndex: newZIndex } : w
+    ));
+    setTopZIndex(newZIndex);
   };
 
   const closePortfolioWindow = (id) => {
@@ -111,9 +157,27 @@ const DesignWorkPage = () => {
     bringToFront(id);
   };
 
+  const onFinderTitleDown = (e, id) => {
+    const p = "touches" in e ? e.touches[0] : e;
+    const window = finderWindows.find(w => w.id === id);
+    if (!window) return;
+    
+    finderDragRef.current[id] = {
+      startX: p.pageX,
+      startY: p.pageY,
+      baseX: window.pos.x,
+      baseY: window.pos.y,
+      dragging: true
+    };
+    document.body.classList.add("no-select");
+    bringFinderToFront(id);
+  };
+
   React.useEffect(() => {
     const move = (e) => {
       const p = e.touches ? e.touches[0] : e;
+      
+      // Handle portfolio window dragging
       Object.keys(portfolioDragRef.current).forEach(id => {
         const drag = portfolioDragRef.current[id];
         if (!drag?.dragging) return;
@@ -125,7 +189,26 @@ const DesignWorkPage = () => {
           w.id === parseInt(id) ? { ...w, pos: { x, y } } : w
         ));
       });
-      if (Object.values(portfolioDragRef.current).some(d => d?.dragging)) {
+
+      // Handle finder window dragging
+      Object.keys(finderDragRef.current).forEach(id => {
+        const drag = finderDragRef.current[id];
+        if (!drag?.dragging) return;
+        
+        const x = drag.baseX + (p.pageX - drag.startX);
+        const y = drag.baseY + (p.pageY - drag.startY);
+        
+        setFinderWindows(prev => prev.map(w =>
+          w.id === parseInt(id) ? { ...w, pos: { x, y } } : w
+        ));
+      });
+
+      const anyDragging = [
+        ...Object.values(portfolioDragRef.current),
+        ...Object.values(finderDragRef.current)
+      ].some(d => d?.dragging);
+      
+      if (anyDragging) {
         e.preventDefault?.();
       }
     };
@@ -134,6 +217,11 @@ const DesignWorkPage = () => {
       Object.keys(portfolioDragRef.current).forEach(id => {
         if (portfolioDragRef.current[id]) {
           portfolioDragRef.current[id].dragging = false;
+        }
+      });
+      Object.keys(finderDragRef.current).forEach(id => {
+        if (finderDragRef.current[id]) {
+          finderDragRef.current[id].dragging = false;
         }
       });
       document.body.classList.remove("no-select");
@@ -149,7 +237,7 @@ const DesignWorkPage = () => {
       window.removeEventListener("touchmove", move);
       window.removeEventListener("touchend", up);
     };
-  }, [portfolioWindows]);
+  }, [portfolioWindows, finderWindows]);
 
   return (
     <>
@@ -179,7 +267,7 @@ const DesignWorkPage = () => {
                 <span className="tl tl-yellow" />
                 <span className="tl tl-green" />
               </div>
-              <div className="fw-title">Library</div>
+              <div className="fw-title">Baki Aydin - Klasörü</div>
               <button className="fw-close" onClick={() => setFinderOpen(false)} aria-label="Close">×</button>
             </div>
 
@@ -207,7 +295,12 @@ const DesignWorkPage = () => {
                 <div className="sb-section">Favorites</div>
                 <ul className="sb-list">
                   {["AirDrop","Recents","Applications","Downloads","Shared"].map(i=>(
-                    <li key={i} className={`sb-item${i==="Downloads" ? " is-active":""}`} tabIndex={0}>
+                    <li 
+                      key={i} 
+                      className={`sb-item${i==="Downloads" ? " is-active":""}`} 
+                      tabIndex={0}
+                      onClick={() => {/* Add functionality if needed */}}
+                    >
                       <span className="sb-dot" aria-hidden="true" />
                       {i}
                     </li>
@@ -216,7 +309,12 @@ const DesignWorkPage = () => {
                 <div className="sb-section">iCloud</div>
                 <ul className="sb-list">
                   {["iCloud Drive","Documents","Desktop"].map(i=>(
-                    <li key={i} className="sb-item" tabIndex={0}>
+                    <li 
+                      key={i} 
+                      className="sb-item" 
+                      tabIndex={0}
+                      onClick={() => {/* Add functionality if needed */}}
+                    >
                       <span className="sb-dot" aria-hidden="true" />
                       {i}
                     </li>
@@ -231,10 +329,7 @@ const DesignWorkPage = () => {
                       key={name}
                       type="button"
                       className={`grid-item${selected===name ? " is-selected":""}`}
-                      onClick={() => {
-                        setSelected(name);
-                        openPortfolioWindow(name);
-                      }}
+                      onClick={() => handleFolderClick(name)}
                       aria-pressed={selected===name}
                       title={name}
                     >
@@ -458,6 +553,242 @@ const DesignWorkPage = () => {
               width: 100%;
               height: 100%;
               border: 0;
+            }
+          `}</style>
+        </div>,
+        document.body
+      ))}
+
+      {/* Archive and Contact Finder Windows */}
+      {finderWindows.map(window => createPortal(
+        <div
+          key={window.id}
+          className="secondary-finder-window"
+          style={{ 
+            left: window.pos.x, 
+            top: window.pos.y,
+            zIndex: window.zIndex
+          }}
+          onMouseDown={() => bringFinderToFront(window.id)}
+          onTouchStart={() => bringFinderToFront(window.id)}
+        >
+          <div
+            className="sfw-titlebar"
+            onMouseDown={(e) => onFinderTitleDown(e, window.id)}
+            onTouchStart={(e) => onFinderTitleDown(e, window.id)}
+          >
+            <div className="traffic">
+              <span className="tl tl-red" />
+              <span className="tl tl-yellow" />
+              <span className="tl tl-green" />
+            </div>
+            <div className="sfw-title">{window.title}</div>
+            <button 
+              className="sfw-close" 
+              onClick={() => closeFinderWindow(window.id)} 
+              aria-label="Close"
+            >×</button>
+          </div>
+
+          <div className="sfw-toolbar">
+            <div className="sfw-nav">
+              <button className="tool" aria-label="Back">
+                <svg width="14" height="14" viewBox="0 0 24 24"><path d="M15 18 9 12l6-6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              </button>
+              <button className="tool" aria-label="Forward">
+                <svg width="14" height="14" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div className="sfw-content">
+            {window.type === "archive" && (
+              <div className="archive-content">
+                <div className="grid">
+                  {["Proje 1", "Proje 2", "Proje 3", "Proje 4", "Proje 5", "Proje 6"].map(name => (
+                    <div key={name} className="grid-item">
+                      <span className="folder-icon" aria-hidden="true" />
+                      <span className="label">{name}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {window.type === "contact" && (
+              <div className="contact-content">
+                <h2>İletişim</h2>
+                <form className="contact-form" onSubmit={(e) => e.preventDefault()}>
+                  <div className="form-group">
+                    <label htmlFor="name">İsim</label>
+                    <input type="text" id="name" name="name" placeholder="Adınız" />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="email">E-posta</label>
+                    <input type="email" id="email" name="email" placeholder="ornek@email.com" />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="subject">Konu</label>
+                    <input type="text" id="subject" name="subject" placeholder="Mesaj konusu" />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="message">Mesaj</label>
+                    <textarea id="message" name="message" rows="6" placeholder="Mesajınızı buraya yazın..."></textarea>
+                  </div>
+                  <button type="submit" className="submit-btn">Gönder</button>
+                </form>
+              </div>
+            )}
+          </div>
+
+          <style>{`
+            .secondary-finder-window {
+              position: fixed; 
+              width: 720px; 
+              height: 520px;
+              border-radius: 12px; 
+              overflow: hidden;
+              background: linear-gradient(#f6f6f8, #ebebee);
+              box-shadow: 0 24px 80px rgba(0,0,0,0.28), 0 6px 20px rgba(0,0,0,0.18);
+              font-family: -apple-system, system-ui, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+              -webkit-font-smoothing: antialiased;
+              text-rendering: optimizeLegibility;
+            }
+            .sfw-titlebar {
+              display: grid; 
+              grid-template-columns: auto 1fr auto;
+              align-items: center; 
+              gap: 8px;
+              height: 44px; 
+              padding: 0 12px;
+              background: linear-gradient(#ededf1, #e4e4e8);
+              border-bottom: 1px solid #dadadd;
+              cursor: move;
+            }
+            .sfw-title { 
+              text-align: center; 
+              font-weight: 600; 
+              font-size: 14px; 
+              color: #2e2e33; 
+            }
+            .sfw-close {
+              appearance: none; 
+              border: 0; 
+              background: transparent;
+              font-size: 20px; 
+              line-height: 1; 
+              width: 32px; 
+              height: 32px;
+              border-radius: 8px; 
+              cursor: pointer; 
+              color: #333;
+            }
+            .sfw-close:hover { 
+              background: rgba(0,0,0,.06); 
+            }
+            .sfw-toolbar { 
+              padding: 8px 12px; 
+              background: #f0f0f3; 
+              border-bottom: 1px solid #e3e3e7; 
+              display: flex; 
+              align-items: center; 
+            }
+            .sfw-nav { 
+              display: flex; 
+              align-items: center; 
+              gap: 8px; 
+            }
+            .sfw-content {
+              height: calc(100% - 44px - 42px);
+              overflow: auto;
+              padding: 20px 24px;
+            }
+
+            /* Archive Content */
+            .archive-content .grid {
+              display: grid;
+              grid-template-columns: repeat(3, 1fr);
+              gap: 40px 48px;
+              align-content: start;
+            }
+            .archive-content .grid-item {
+              text-align: center;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              gap: 8px;
+              cursor: pointer;
+              padding: 12px;
+              border-radius: 8px;
+            }
+            .archive-content .grid-item:hover {
+              background: rgba(0,0,0,.03);
+            }
+
+            /* Contact Form */
+            .contact-content {
+              max-width: 500px;
+              margin: 0 auto;
+            }
+            .contact-content h2 {
+              font-size: 24px;
+              font-weight: 600;
+              color: #1d1d1f;
+              margin-bottom: 24px;
+              text-align: center;
+            }
+            .contact-form {
+              display: flex;
+              flex-direction: column;
+              gap: 16px;
+            }
+            .form-group {
+              display: flex;
+              flex-direction: column;
+              gap: 6px;
+            }
+            .form-group label {
+              font-size: 13px;
+              font-weight: 500;
+              color: #1d1d1f;
+            }
+            .form-group input,
+            .form-group textarea {
+              padding: 10px 12px;
+              border: 1px solid #d1d1d6;
+              border-radius: 6px;
+              font-size: 14px;
+              font-family: inherit;
+              background: #fff;
+              color: #1d1d1f;
+              transition: border-color 0.2s;
+            }
+            .form-group input:focus,
+            .form-group textarea:focus {
+              outline: none;
+              border-color: #007aff;
+            }
+            .form-group textarea {
+              resize: vertical;
+              min-height: 100px;
+            }
+            .submit-btn {
+              padding: 12px 24px;
+              background: #007aff;
+              color: white;
+              border: none;
+              border-radius: 8px;
+              font-size: 14px;
+              font-weight: 600;
+              cursor: pointer;
+              transition: background 0.2s;
+              margin-top: 8px;
+            }
+            .submit-btn:hover {
+              background: #0051d5;
+            }
+            .submit-btn:active {
+              background: #004fc4;
             }
           `}</style>
         </div>,
