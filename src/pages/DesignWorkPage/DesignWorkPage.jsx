@@ -26,8 +26,16 @@ const DesignWorkPage = () => {
 
   React.useEffect(() => {
     // center window on first paint (match CSS width/height)
-    const W = 720, H = 520;
-    setPos({ x: (window.innerWidth - W) / 2, y: (window.innerHeight - H) / 2 });
+    const updatePosition = () => {
+      const isMobile = window.innerWidth < 768;
+      const W = isMobile ? window.innerWidth - 20 : 720;
+      const H = isMobile ? window.innerHeight - 20 : 520;
+      setPos({ x: (window.innerWidth - W) / 2, y: (window.innerHeight - H) / 2 });
+    };
+    
+    updatePosition();
+    window.addEventListener('resize', updatePosition);
+    return () => window.removeEventListener('resize', updatePosition);
   }, []);
 
   // Library window drag handlers
@@ -86,13 +94,18 @@ const DesignWorkPage = () => {
   // Portfolio window handlers
   const openPortfolioWindow = (folderName) => {
     const id = Date.now();
+    const isMobile = window.innerWidth < 768;
+    const W = isMobile ? window.innerWidth - 20 : 960;
+    const H = isMobile ? window.innerHeight - 20 : 640;
+    const offset = isMobile ? 0 : portfolioWindows.length * 30;
+    
     const newWindow = {
       id,
       title: "Portfolio",
       folder: folderName,
       pos: { 
-        x: (window.innerWidth - 960) / 2 + portfolioWindows.length * 30, 
-        y: (window.innerHeight - 640) / 2 + portfolioWindows.length * 30 
+        x: (window.innerWidth - W) / 2 + offset, 
+        y: (window.innerHeight - H) / 2 + offset 
       },
       zIndex: topZIndex + 1
     };
@@ -103,13 +116,18 @@ const DesignWorkPage = () => {
   // Finder window handlers (for Archive and Contact)
   const openFinderWindow = (folderName, type) => {
     const id = Date.now();
+    const isMobile = window.innerWidth < 768;
+    const W = isMobile ? window.innerWidth - 20 : 720;
+    const H = isMobile ? window.innerHeight - 20 : 520;
+    const offset = isMobile ? 0 : finderWindows.length * 30;
+    
     const newWindow = {
       id,
       title: folderName,
       type,
       pos: { 
-        x: (window.innerWidth - 720) / 2 + finderWindows.length * 30, 
-        y: (window.innerHeight - 520) / 2 + finderWindows.length * 30 
+        x: (window.innerWidth - W) / 2 + offset, 
+        y: (window.innerHeight - H) / 2 + offset 
       },
       zIndex: topZIndex + 1
     };
@@ -360,6 +378,21 @@ const DesignWorkPage = () => {
               -webkit-font-smoothing: antialiased;
               text-rendering: optimizeLegibility;
             }
+            @media (max-width: 767px) {
+              .finder-overlay .finder-window {
+                width: calc(100vw - 20px);
+                height: calc(100vh - 20px);
+                border-radius: 8px;
+              }
+            }
+            @media (min-width: 768px) and (max-width: 1024px) {
+              .finder-overlay .finder-window {
+                width: calc(100vw - 40px);
+                height: calc(100vh - 40px);
+                max-width: 720px;
+                max-height: 520px;
+              }
+            }
             .finder-overlay .fw-titlebar {
               display: grid; grid-template-columns: auto 1fr auto;
               align-items: center; gap: 8px;
@@ -367,6 +400,12 @@ const DesignWorkPage = () => {
               background: linear-gradient(#ededf1, #e4e4e8);
               border-bottom: 1px solid #dadadd;
               cursor: move;
+            }
+            @media (max-width: 767px) {
+              .finder-overlay .fw-titlebar {
+                height: 40px;
+                padding: 0 8px;
+              }
             }
             .finder-overlay .traffic { display: flex; gap: 8px; }
             .finder-overlay .tl { width: 12px; height: 12px; border-radius: 50%; display: inline-block; box-shadow: inset 0 1px 2px rgba(0,0,0,.15); }
@@ -405,6 +444,23 @@ const DesignWorkPage = () => {
             .finder-overlay .seg:last-child { border-right: 0; }
             .finder-overlay .seg.on { background: #007aff; color: white; }
             .finder-overlay .fw-body { display: grid; grid-template-columns: 240px 1fr; height: calc(100% - 44px - 42px); }
+            @media (max-width: 767px) {
+              .finder-overlay .fw-body {
+                grid-template-columns: 1fr;
+                height: calc(100% - 40px - 40px);
+              }
+              .finder-overlay .fw-sidebar {
+                display: none;
+              }
+              .finder-overlay .fw-toolbar {
+                padding: 6px 8px;
+              }
+            }
+            @media (min-width: 768px) and (max-width: 1024px) {
+              .finder-overlay .fw-body {
+                grid-template-columns: 180px 1fr;
+              }
+            }
             .finder-overlay .fw-sidebar { background:#f7f7fa; border-right:1px solid #ececf0; padding:16px 12px; overflow:auto; }
             .finder-overlay .sb-section { 
               font-size: 11px; font-weight: 600; color: #8e8e93; 
@@ -420,7 +476,24 @@ const DesignWorkPage = () => {
             .finder-overlay .sb-item.is-active { background: #007aff; color: white; }
             .finder-overlay .sb-dot { width: 8px; height: 8px; border-radius: 50%; background: #888; }
             .finder-overlay .fw-content { padding: 20px 24px; overflow:auto; }
+            @media (max-width: 767px) {
+              .finder-overlay .fw-content {
+                padding: 12px;
+              }
+            }
             .finder-overlay .grid { display:grid; grid-template-columns: repeat(3, 1fr); gap: 40px 48px; align-content: start; }
+            @media (max-width: 767px) {
+              .finder-overlay .grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 24px 16px;
+              }
+            }
+            @media (min-width: 768px) and (max-width: 1024px) {
+              .finder-overlay .grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 32px 24px;
+              }
+            }
             .finder-overlay .grid-item { 
               background: transparent; border:0; text-align:center; cursor: pointer; 
               position: relative; padding: 12px; border-radius: 8px;
@@ -432,6 +505,15 @@ const DesignWorkPage = () => {
               width: 64px; height: 64px; background: #4A90E2;
               border-radius: 8px; display: block;
               position: relative;
+            }
+            @media (max-width: 767px) {
+              .finder-overlay .folder-icon {
+                width: 48px;
+                height: 48px;
+              }
+              .finder-overlay .folder-icon::before {
+                font-size: 36px !important;
+              }
             }
             .finder-overlay .folder-icon::before {
               content: "📁"; font-size: 48px; 
@@ -505,6 +587,21 @@ const DesignWorkPage = () => {
               -webkit-font-smoothing: antialiased;
               text-rendering: optimizeLegibility;
             }
+            @media (max-width: 767px) {
+              .portfolio-window {
+                width: calc(100vw - 20px);
+                height: calc(100vh - 20px);
+                border-radius: 8px;
+              }
+            }
+            @media (min-width: 768px) and (max-width: 1024px) {
+              .portfolio-window {
+                width: calc(100vw - 40px);
+                height: calc(100vh - 40px);
+                max-width: 960px;
+                max-height: 640px;
+              }
+            }
             .pw-titlebar {
               display: grid; 
               grid-template-columns: auto 1fr auto;
@@ -515,6 +612,12 @@ const DesignWorkPage = () => {
               background: linear-gradient(#ededf1, #e4e4e8);
               border-bottom: 1px solid #dadadd;
               cursor: move;
+            }
+            @media (max-width: 767px) {
+              .pw-titlebar {
+                height: 40px;
+                padding: 0 8px;
+              }
             }
             .pw-title { 
               text-align: center; 
@@ -654,6 +757,21 @@ const DesignWorkPage = () => {
               -webkit-font-smoothing: antialiased;
               text-rendering: optimizeLegibility;
             }
+            @media (max-width: 767px) {
+              .secondary-finder-window {
+                width: calc(100vw - 20px);
+                height: calc(100vh - 20px);
+                border-radius: 8px;
+              }
+            }
+            @media (min-width: 768px) and (max-width: 1024px) {
+              .secondary-finder-window {
+                width: calc(100vw - 40px);
+                height: calc(100vh - 40px);
+                max-width: 720px;
+                max-height: 520px;
+              }
+            }
             .sfw-titlebar {
               display: grid; 
               grid-template-columns: auto 1fr auto;
@@ -664,6 +782,12 @@ const DesignWorkPage = () => {
               background: linear-gradient(#ededf1, #e4e4e8);
               border-bottom: 1px solid #dadadd;
               cursor: move;
+            }
+            @media (max-width: 767px) {
+              .sfw-titlebar {
+                height: 40px;
+                padding: 0 8px;
+              }
             }
             .sfw-title { 
               text-align: center; 
@@ -703,6 +827,15 @@ const DesignWorkPage = () => {
               overflow: auto;
               padding: 20px 24px;
             }
+            @media (max-width: 767px) {
+              .sfw-content {
+                height: calc(100% - 40px - 40px);
+                padding: 12px;
+              }
+              .sfw-toolbar {
+                padding: 6px 8px !important;
+              }
+            }
 
             /* Archive Content */
             .archive-content .grid {
@@ -710,6 +843,18 @@ const DesignWorkPage = () => {
               grid-template-columns: repeat(3, 1fr);
               gap: 40px 48px;
               align-content: start;
+            }
+            @media (max-width: 767px) {
+              .archive-content .grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 24px 16px;
+              }
+            }
+            @media (min-width: 768px) and (max-width: 1024px) {
+              .archive-content .grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 32px 24px;
+              }
             }
             .archive-content .grid-item {
               text-align: center;
@@ -721,6 +866,22 @@ const DesignWorkPage = () => {
               padding: 12px;
               border-radius: 8px;
             }
+            @media (max-width: 767px) {
+              .archive-content .grid-item {
+                padding: 8px;
+                gap: 6px;
+              }
+              .archive-content .folder-icon {
+                width: 48px !important;
+                height: 48px !important;
+              }
+              .archive-content .folder-icon::before {
+                font-size: 36px !important;
+              }
+              .archive-content .label {
+                font-size: 11px !important;
+              }
+            }
             .archive-content .grid-item:hover {
               background: rgba(0,0,0,.03);
             }
@@ -730,12 +891,23 @@ const DesignWorkPage = () => {
               max-width: 500px;
               margin: 0 auto;
             }
+            @media (max-width: 767px) {
+              .contact-content {
+                max-width: 100%;
+              }
+            }
             .contact-content h2 {
               font-size: 24px;
               font-weight: 600;
               color: #1d1d1f;
               margin-bottom: 24px;
               text-align: center;
+            }
+            @media (max-width: 767px) {
+              .contact-content h2 {
+                font-size: 20px;
+                margin-bottom: 16px;
+              }
             }
             .contact-form {
               display: flex;
@@ -762,6 +934,13 @@ const DesignWorkPage = () => {
               background: #fff;
               color: #1d1d1f;
               transition: border-color 0.2s;
+            }
+            @media (max-width: 767px) {
+              .form-group input,
+              .form-group textarea {
+                padding: 8px 10px;
+                font-size: 13px;
+              }
             }
             .form-group input:focus,
             .form-group textarea:focus {
