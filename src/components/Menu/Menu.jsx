@@ -1,20 +1,19 @@
 import React, { useState } from "react";
+import { useNavigate, useLocation } from "react-router";
 import "./Menu.scss";
+import { useToggleRoomStore } from "../../stores/toggleRoomStore";
 
 const ITEMS = [
-  { id: "home", label: "Ana Sayfa", icon: HomeIcon },
+  { id: "home", label: "Odayı Değiştir", icon: HomeIcon },
   { id: "design", label: "Tasarım", icon: PenIcon },
   { id: "brain", label: "Beyin Fırtınası", icon: BrainIcon },
 ];
 
 export default function Menu({ active: initial = "home", onChange }) {
   const [active, setActive] = useState(initial);
-  // replace react-router navigate with browser navigation (works in Vite and on Vercel)
-  const navigate = (to, { replace } = {}) => {
-    if (!to) return;
-    if (replace) window.location.replace(to);
-    else window.location.assign(to);
-  };
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { isDarkRoom, setDarkRoom, isTransitioning } = useToggleRoomStore();
 
   const PATHS = {
     design: "/design-work",
@@ -24,7 +23,20 @@ export default function Menu({ active: initial = "home", onChange }) {
   const handleClick = (id) => {
     setActive(id);
     onChange && onChange(id);
-    if (PATHS[id]) navigate(PATHS[id]); // navigate for mapped ids
+    
+    // Handle room toggle like RoomToggleButton
+    if (id === "home") {
+      // Only toggle if we're on the home page
+      if (location.pathname === "/" && !isTransitioning) {
+        setDarkRoom(!isDarkRoom);
+      } else if (location.pathname !== "/") {
+        // Navigate to home if not already there
+        navigate("/");
+      }
+    } else if (PATHS[id]) {
+      // Navigate to other pages using React Router (no page refresh)
+      navigate(PATHS[id]);
+    }
   };
 
   return (
