@@ -27,6 +27,16 @@ const DesignWorkPage = () => {
   // Persona dropdown state
   const [selectedPersona, setSelectedPersona] = React.useState({ icon: '👽', label: 'Uzaylı Olarak' });
 
+  // Cleanup effect - close all windows when component unmounts
+  React.useEffect(() => {
+    return () => {
+      // Close all windows when navigating away from this page
+      setFinderOpen(false);
+      setPortfolioWindows([]);
+      setFinderWindows([]);
+    };
+  }, []);
+
   React.useEffect(() => {
     // Handle clicks outside persona dropdowns to close them
     const handleClickOutside = (e) => {
