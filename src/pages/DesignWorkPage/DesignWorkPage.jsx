@@ -10,6 +10,7 @@ const DesignWorkPage = () => {
 
   // Library window state
   const [finderOpen, setFinderOpen] = React.useState(true);
+  const [isClosing, setIsClosing] = React.useState(false);
   const [pos, setPos] = React.useState({ x: 0, y: 0 });
   const dragRef = React.useRef({
     startX: 0, startY: 0, baseX: 0, baseY: 0, dragging: false
@@ -36,6 +37,24 @@ const DesignWorkPage = () => {
       setFinderWindows([]);
     };
   }, []);
+
+  // Close handler with animation
+  const handleClose = () => {
+    setIsClosing(true);
+    setTimeout(() => {
+      setFinderOpen(false);
+      setIsClosing(false);
+    }, 300); // Match animation duration
+  };
+
+  // Handle clicks on overlay background
+  const handleOverlayClick = (e) => {
+    if (e.target === e.currentTarget) {
+      e.preventDefault();
+      e.stopPropagation();
+      handleClose();
+    }
+  };
 
   React.useEffect(() => {
     // Handle clicks outside persona dropdowns to close them
@@ -388,12 +407,12 @@ const DesignWorkPage = () => {
     <>
       {finderOpen && createPortal(
         <div
-          className="finder-overlay"
+          className={`finder-overlay${isClosing ? ' closing' : ''}`}
           role="dialog"
           aria-modal="true"
           aria-label="Finder — Library"
-          onMouseDown={(e) => { if (e.target === e.currentTarget) setFinderOpen(false); }}
-          onTouchStart={(e) => { if (e.target === e.currentTarget) setFinderOpen(false); }}
+          onMouseDown={handleOverlayClick}
+          onTouchStart={handleOverlayClick}
         >
           <div
             className="finder-window"
@@ -413,7 +432,7 @@ const DesignWorkPage = () => {
                 <span className="tl tl-green" />
               </div>
               <div className="fw-title">Baki Aydin - Klasörü</div>
-              <button className="fw-close" onClick={() => setFinderOpen(false)} aria-label="Close">×</button>
+              <button className="fw-close" onClick={handleClose} aria-label="Close">×</button>
             </div>
 
            
@@ -477,6 +496,34 @@ const DesignWorkPage = () => {
               background: rgba(15,15,20,0.25);
               backdrop-filter: blur(12px);
               -webkit-backdrop-filter: blur(12px);
+              animation: fadeIn 0.3s ease-out;
+            }
+            @keyframes fadeIn {
+              from {
+                opacity: 0;
+                backdrop-filter: blur(0px);
+                -webkit-backdrop-filter: blur(0px);
+              }
+              to {
+                opacity: 1;
+                backdrop-filter: blur(12px);
+                -webkit-backdrop-filter: blur(12px);
+              }
+            }
+            @keyframes fadeOut {
+              from {
+                opacity: 1;
+                backdrop-filter: blur(12px);
+                -webkit-backdrop-filter: blur(12px);
+              }
+              to {
+                opacity: 0;
+                backdrop-filter: blur(0px);
+                -webkit-backdrop-filter: blur(0px);
+              }
+            }
+            .finder-overlay.closing {
+              animation: fadeOut 0.3s ease-out forwards;
             }
             .finder-overlay .finder-window {
               position: fixed; width: 720px; height: 520px;
@@ -487,6 +534,30 @@ const DesignWorkPage = () => {
               font-family: -apple-system, system-ui, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
               -webkit-font-smoothing: antialiased;
               text-rendering: optimizeLegibility;
+              animation: windowFadeIn 0.3s ease-out;
+            }
+            @keyframes windowFadeIn {
+              from {
+                opacity: 0;
+                transform: scale(0.95) translateY(10px);
+              }
+              to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+              }
+            }
+            .finder-overlay.closing .finder-window {
+              animation: windowFadeOut 0.3s ease-out forwards;
+            }
+            @keyframes windowFadeOut {
+              from {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+              }
+              to {
+                opacity: 0;
+                transform: scale(0.95) translateY(10px);
+              }
             }
             @media (max-width: 767px) {
               .finder-overlay .finder-window {
@@ -696,6 +767,17 @@ const DesignWorkPage = () => {
               font-family: -apple-system, system-ui, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
               -webkit-font-smoothing: antialiased;
               text-rendering: optimizeLegibility;
+              animation: windowPopIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            }
+            @keyframes windowPopIn {
+              from {
+                opacity: 0;
+                transform: scale(0.9);
+              }
+              to {
+                opacity: 1;
+                transform: scale(1);
+              }
             }
             @media (max-width: 767px) {
               .portfolio-window {
@@ -950,6 +1032,7 @@ const DesignWorkPage = () => {
               font-family: -apple-system, system-ui, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
               -webkit-font-smoothing: antialiased;
               text-rendering: optimizeLegibility;
+              animation: windowPopIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             }
             @media (max-width: 767px) {
               .secondary-finder-window {
