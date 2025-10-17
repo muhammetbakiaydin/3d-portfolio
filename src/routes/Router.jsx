@@ -4,6 +4,7 @@ import TransitionComponent from "../components/Transition";
 import AboutPage from "../pages/AboutPage/AboutPage";
 import DevWorkPage from "../pages/DevWorkPage/DevWorkPage";
 import DesignWorkPage from "../pages/DesignWorkPage/DesignWorkPage";
+import BrainStormingPage from "../pages/BrainStormingPage/BrainStormingPage";
 import { Route, Routes } from "react-router";
 import NotFoundPage from "../pages/NotFoundPage/NotFoundPage";
 
@@ -39,6 +40,14 @@ const Router = () => {
         element={
           <TransitionComponent>
             <DesignWorkPage />
+          </TransitionComponent>
+        }
+      />
+      <Route
+        path="brain-storming"
+        element={
+          <TransitionComponent>
+            <BrainStormingPage />
           </TransitionComponent>
         }
       />

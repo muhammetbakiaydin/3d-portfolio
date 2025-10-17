@@ -17,7 +17,7 @@ export default function Menu({ active: initial = "home", onChange }) {
 
   const PATHS = {
     design: "/design-work",
-    // you can add others later
+    brain: "/brain-storming",
   };
 
   const handleClick = (id) => {
