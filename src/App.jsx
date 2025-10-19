@@ -26,7 +26,7 @@ function App() {
       <Menu />
       <Logo />
       <LoadingPage />
-      <RoomToggleButton />
+      
       <Overlay />
       <Router />
       <Experience />

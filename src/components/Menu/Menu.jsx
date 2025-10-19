@@ -6,7 +6,7 @@ import { useToggleRoomStore } from "../../stores/toggleRoomStore";
 const ITEMS = [
   { id: "home", label: "Odayı Değiştir", icon: HomeIcon },
   { id: "design", label: "Tasarım", icon: PenIcon },
-  { id: "brain", label: "Beyin Fırtınası", icon: BrainIcon },
+  { id: "brain", label: "Baki", icon: BrainIcon },
 ];
 
 export default function Menu({ active: initial = "home", onChange }) {
@@ -17,7 +17,7 @@ export default function Menu({ active: initial = "home", onChange }) {
 
   const PATHS = {
     design: "/design-work",
-    brain: "/brain-storming",
+    brain: "/about",
   };
 
   const handleClick = (id) => {

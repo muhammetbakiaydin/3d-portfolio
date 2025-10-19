@@ -1,0 +1,59 @@
+.dev-work-page {
+  width: 100%;
+  height: 100vh;
+  background: #000;
+  position: relative;
+}
+
+.dev-work-fallback {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+}
+
+.fallback-content {
+  text-align: center;
+  max-width: 600px;
+  padding: 40px;
+}
+
+.fallback-title {
+  font-size: clamp(32px, 5vw, 64px);
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 20px;
+  letter-spacing: -0.02em;
+}
+
+.fallback-quote {
+  font-size: clamp(16px, 2vw, 20px);
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 40px;
+  line-height: 1.6;
+  font-style: italic;
+}
+
+.fallback-button {
+  padding: 16px 32px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 30px rgba(99, 102, 241, 0.5);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}

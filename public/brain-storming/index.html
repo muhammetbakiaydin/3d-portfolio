@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" class="no-js">
+<html lang="tr" class="no-js">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Staggered (3D) Grid Animations | Codrops</title>
+  <title>Baki Aydin | Brain Storming</title>
   <meta name="keywords" content="scroll animation, grid, gsap, 3d, filter" />
   <meta name="author" content="Codrops" />
   <link rel="shortcut icon" href="favicon.ico">
@@ -15,12 +15,11 @@
 <body class="loading">
   <main class="shadow">
     <div class="frame">
-      <a class="frame__back" href="https://tympanus.net/codrops/?p=81462">Article</a>
-      <a class="frame__archive" href="https://tympanus.net/codrops/demos">All demos</a>
-      <a class="frame__github" href="https://github.com/codrops/Staggered3DGridAnimations">GitHub</a>
+      <a class="frame__back" href="https:/baki.works">Ana Sayfa</a>
+     
     </div>
     <div class="intro"> 
-      <h1 class="intro__title font-alt">Staggered (3D) <br>Grid Animations</h1> 
+      <h1 class="intro__title font-alt">Beyin Fırtınası</h1> 
       <nav class="tags">
         <a href="https://tympanus.net/codrops/demos/?tag=scroll">#scroll</a>
         <a href="https://tympanus.net/codrops/demos/?tag=3d">#3d</a>
@@ -253,21 +252,21 @@
       </div><!-- grid -->
       <div class="mark">
         <div class="mark__inner font-alt">
-          <span>Sora Takahashi</span> <span>空 高橋</span>
-          <span>Aoi Nakamura</span> <span>葵 中村</span>
-          <span>Ren Fujimoto</span> <span>蓮 藤本</span>
-          <span>Mio Sakurai</span> <span>澪 桜井</span>
-          <span>Shin Yamamoto</span> <span>真 山本</span>
-          <span>Kaori Kobayashi</span> <span>香織 小林</span>
-          <span>Hikari Inoue</span> <span>光 井上</span>
-          <span>Yuki Kinoshita</span> <span>雪 木下</span>
-          <span>Rina Ishikawa</span> <span>莉奈 石川</span>
-          <span>Kaito Matsumoto</span> <span>海斗 松本</span>
+          <span>iNATÇI AMA AÇIK FİKİRLİ</span> <span>☯️</span>
+          <span>SOĞUK AMA SAMİMİ</span> <span>🧊❤️</span>
+          <span>HIZLI AMA SABIRLI</span> <span> ⏩⏳</span>
+          <span>MANTIKLI AMA DUYGUSAL</span> <span>🧠</span>
+          <span>ŞEFFAF AMA GİZEMLİ</span> <span>👀</span>
+          <span>KİBİRLİ AMA MÜTEVAZİ</span> <span>🙇‍♂️</span>
+          <span>BASİT AMA ETKİLİ</span> <span>✨🎯</span>
+          <span>DENEYİMSEL TASARIM</span> <span>🎨</span>
+          <span>HEPSİ İÇİNDE</span> <span>🎯</span>
+          <span>BAKİ</span> <span>AYDİN</span>
         </div>
       </div>
     </section>
     <section>
-      <div class="text font-alt">Halcyon</div>
+      <div class="text font-alt">Baki Aydin  </div>  
     </section>
     <section>
       <div class="grid grid--full">
@@ -378,8 +377,10 @@
         </figure>
       </div>
     </section>
-    <p class="credits font-alt">Made by <a href="https://x.com/codrops">@codrops</a></p>
-    <p class="credits font-alt"><a href="https://tympanus.net/codrops/demos">More demos</a></p>
+
+    
+    <p class="credits font-alt"><a href="https://www.linkedin.com/in/mbakiaydin/"> Sosyal</a></p>
+   
   </main>
   <script src="https://tympanus.net/codrops/adpacks/cda_sponsor.js"></script>
   <!-- GSAP library -->
@@ -398,5 +399,398 @@
 
   <!-- Scripts for the effect -->
   <script type="module" src="js/index.js"></script>
+
+  <!-- Comment Board -->
+  <button id="commentButton" class="comment-floating-button" aria-label="Yorumlar">💬</button>
+  
+  <div id="commentBoardOverlay" class="comment-board-overlay" style="display: none;"></div>
+  
+  <div id="commentBoard" class="comment-board" style="display: none;">
+    <div class="comment-board__header">
+      <h2>💬 Beyin Fırtınası Panosu</h2>
+      <button id="closeCommentBoard" class="comment-board__close">✕</button>
+    </div>
+    
+    <div class="comment-board__comments" id="commentsList"></div>
+    
+    <form class="comment-board__form" id="commentForm">
+      <div class="comment-board__form-row">
+        <div class="avatar-picker">
+          <button type="button" class="avatar-picker__selected" id="avatarButton">👨‍💻</button>
+          <div class="avatar-picker__dropdown" id="avatarDropdown" style="display: none;">
+            <button type="button" class="avatar-picker__option" data-avatar="👨‍💻">👨‍💻</button>
+            <button type="button" class="avatar-picker__option" data-avatar="👩‍💻">👩‍💻</button>
+            <button type="button" class="avatar-picker__option" data-avatar="🎨">🎨</button>
+            <button type="button" class="avatar-picker__option" data-avatar="🚀">🚀</button>
+            <button type="button" class="avatar-picker__option" data-avatar="💡">💡</button>
+            <button type="button" class="avatar-picker__option" data-avatar="🌟">🌟</button>
+            <button type="button" class="avatar-picker__option" data-avatar="🎯">🎯</button>
+            <button type="button" class="avatar-picker__option" data-avatar="🔥">🔥</button>
+            <button type="button" class="avatar-picker__option" data-avatar="✨">✨</button>
+            <button type="button" class="avatar-picker__option" data-avatar="🎭">🎭</button>
+          </div>
+        </div>
+        <input type="text" id="authorInput" class="comment-board__input" placeholder="İsminiz..." maxlength="30" required>
+      </div>
+      <textarea id="messageInput" class="comment-board__textarea" placeholder="Düşüncelerinizi paylaşın..." maxlength="500" rows="3" required></textarea>
+      <div class="comment-board__form-footer">
+        <span class="comment-board__char-count"><span id="charCount">0</span>/500</span>
+        <button type="submit" class="comment-board__submit">Gönder 📤</button>
+      </div>
+    </form>
+  </div>
+
+  <style>
+    /* Comment Board Styles */
+    .comment-board-overlay {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      background: rgba(0, 0, 0, 0.4) !important;
+      backdrop-filter: blur(4px) !important;
+      z-index: 99998 !important;
+      animation: fadeIn 0.3s ease !important;
+    }
+
+    .comment-floating-button {
+      position: fixed !important;
+      right: 24px !important;
+      bottom: 24px !important;
+      width: 64px !important;
+      height: 64px !important;
+      border-radius: 50% !important;
+      border: none !important;
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(168, 85, 247, 0.9)) !important;
+      backdrop-filter: blur(10px) !important;
+      color: white !important;
+      font-size: 28px !important;
+      cursor: pointer !important;
+      box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1) inset !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      z-index: 99999 !important;
+      transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55) !important;
+    }
+
+    .comment-floating-button:hover {
+      transform: scale(1.1);
+      box-shadow: 0 12px 32px rgba(99, 102, 241, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.2) inset;
+    }
+
+    .comment-floating-button.active {
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.9), rgba(220, 38, 38, 0.9));
+      box-shadow: 0 8px 24px rgba(239, 68, 68, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+    }
+
+    .comment-board {
+      position: fixed !important;
+      right: 20px !important;
+      bottom: 100px !important;
+      width: 420px !important;
+      max-width: calc(100vw - 40px) !important;
+      height: 600px !important;
+      max-height: calc(100vh - 140px) !important;
+      background: rgba(255, 255, 255, 0.08) !important;
+      backdrop-filter: blur(20px) saturate(180%) !important;
+      border: 1px solid rgba(255, 255, 255, 0.18) !important;
+      border-radius: 20px !important;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 0 0 0.5px rgba(255, 255, 255, 0.1) inset !important;
+      z-index: 99999 !important;
+      flex-direction: column !important;
+      animation: slideInUp 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55) !important;
+      overflow: hidden !important;
+    }
+
+    .comment-board__header {
+      padding: 20px 24px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .comment-board__header h2 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.95);
+    }
+
+    .comment-board__close {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 18px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .comment-board__close:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: scale(1.1);
+    }
+
+    .comment-board__comments {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .comment-board__comments::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .comment-board__comments::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 3px;
+    }
+
+    .comment-board__comments::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 3px;
+    }
+
+    .comment-item {
+      display: flex;
+      gap: 12px;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      animation: fadeInUp 0.3s ease;
+    }
+
+    .comment-item__avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .comment-item__content {
+      flex: 1;
+    }
+
+    .comment-item__header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+
+    .comment-item__author {
+      font-weight: 600;
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .comment-item__time {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    .comment-item__message {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.5;
+      color: rgba(255, 255, 255, 0.75);
+    }
+
+    .comment-board__form {
+      padding: 16px 24px 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.03);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .comment-board__form-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .avatar-picker {
+      position: relative;
+    }
+
+    .avatar-picker__selected {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.08);
+      font-size: 20px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .avatar-picker__selected:hover {
+      background: rgba(255, 255, 255, 0.12);
+      transform: scale(1.05);
+    }
+
+    .avatar-picker__dropdown {
+      position: absolute;
+      bottom: 100%;
+      left: 0;
+      margin-bottom: 8px;
+      padding: 8px;
+      background: rgba(30, 30, 30, 0.95);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      z-index: 10;
+    }
+
+    .avatar-picker__option {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      background: rgba(255, 255, 255, 0.05);
+      font-size: 18px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .avatar-picker__option:hover {
+      background: rgba(255, 255, 255, 0.1);
+      transform: scale(1.1);
+    }
+
+    .comment-board__input,
+    .comment-board__textarea {
+      padding: 10px 14px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 10px;
+      color: rgba(255, 255, 255, 0.95);
+      font-size: 14px;
+      font-family: inherit;
+      transition: all 0.2s ease;
+    }
+
+    .comment-board__input {
+      flex: 1;
+    }
+
+    .comment-board__textarea {
+      width: 100%;
+      resize: none;
+    }
+
+    .comment-board__input::placeholder,
+    .comment-board__textarea::placeholder {
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    .comment-board__input:focus,
+    .comment-board__textarea:focus {
+      outline: none;
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.3);
+      box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+    }
+
+    .comment-board__form-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .comment-board__char-count {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    .comment-board__submit {
+      padding: 10px 20px;
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.8), rgba(168, 85, 247, 0.8));
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      color: white;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .comment-board__submit:hover:not(:disabled) {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 1), rgba(168, 85, 247, 1));
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+    }
+
+    .comment-board__submit:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 767px) {
+      .comment-floating-button {
+        right: 16px;
+        bottom: 16px;
+        width: 56px;
+        height: 56px;
+        font-size: 24px;
+      }
+
+      .comment-board {
+        right: 10px;
+        left: 10px;
+        bottom: 80px;
+        width: auto;
+        height: calc(100vh - 180px);
+      }
+    }
+  </style>
+
+  <script src="js/comments.js"></script>
 </body>
 </html>
