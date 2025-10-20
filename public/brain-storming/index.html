@@ -385,12 +385,17 @@
   <script src="https://tympanus.net/codrops/adpacks/cda_sponsor.js"></script>
   <!-- GSAP library -->
   <script src="js/gsap.min.js"></script>
-  <script>
-    // Suppress GSAP trial warning
-    gsap.config({ trialWarn: false });
-  </script>
   <!-- GSAP ScrollTrigger plugin -->
   <script src="js/ScrollTrigger.min.js"></script>
+  <script>
+    // Suppress GSAP trial warning and prevent redirect in iframe
+    gsap.config({ trialWarn: false });
+    
+    // Prevent SplitText trial redirect when in iframe
+    if (window.self !== window.top) {
+      window.open = function() { return null; };
+    }
+  </script>
   <!-- GSAP SplitText (Club Membership), Trial only https://gsap.com/resources/trial/ -->
   <script src="https://assets.codepen.io/16327/SplitText3.min.js"></script>
 
